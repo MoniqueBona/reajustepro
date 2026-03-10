@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReajustePro — Base Comercial</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0d12;--surface:#111620;--surface2:#181f2e;--border:#1e2a3a;--accent:#00e5a0;--accent2:#0090ff;--accent3:#ff6b35;--text:#e8edf5;--muted:#5a6a80;--warning:#ffb800;--danger:#ff4d6d;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,160,0.03)1px,transparent 1px),linear-gradient(90deg,rgba(0,229,160,0.03)1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+.container{max-width:1200px;margin:0 auto;padding:0 24px;position:relative;z-index:1;}
+header{border-bottom:1px solid var(--border);padding:20px 0;background:rgba(10,13,18,0.95);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;}
+.header-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;letter-spacing:-0.03em;display:flex;align-items:center;gap:8px;}
+.logo-dot{width:10px;height:10px;background:var(--accent);border-radius:50%;box-shadow:0 0 12px var(--accent);}
+.header-badges{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.hbadge{font-family:'IBM Plex Mono',monospace;font-size:0.68rem;color:var(--muted);background:var(--surface);border:1px solid var(--border);padding:4px 10px;border-radius:4px;display:flex;align-items:center;gap:5px;}
+.hbadge .dot{width:6px;height:6px;border-radius:50%;background:var(--muted);}
+.hbadge.live .dot{background:var(--accent);box-shadow:0 0 6px var(--accent);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.nav-tabs{display:flex;gap:4px;padding:24px 0 0;border-bottom:1px solid var(--border);margin-bottom:32px;overflow-x:auto;}
+.tab-btn{font-family:'Syne',sans-serif;font-size:0.82rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;padding:10px 20px;background:none;border:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.2s;white-space:nowrap;}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:20px;}
+.card-title{font-family:'Syne',sans-serif;font-size:0.7rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.card-title::before{content:'';width:6px;height:6px;background:var(--accent);border-radius:50%;flex-shrink:0;}
+/* Loading states */
+.loading-ring{display:inline-block;width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.data-status{font-family:'IBM Plex Mono',monospace;font-size:0.65rem;padding:2px 8px;border-radius:3px;display:inline-flex;align-items:center;gap:4px;}
+.data-status.loading{color:var(--muted);background:rgba(255,255,255,0.03);}
+.data-status.ok{color:var(--accent);background:rgba(0,229,160,0.08);}
+.data-status.err{color:var(--danger);background:rgba(255,77,109,0.08);}
+/* Indices grid */
+.indices-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-bottom:24px;}
+/* Cards do mês atual */
+.mes-cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:28px;}
+.mes-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 22px;position:relative;overflow:hidden;transition:all 0.2s;}
+.mes-card:hover{transform:translateY(-2px);border-color:rgba(0,229,160,0.3);}
+.mes-card.live{border-color:rgba(0,229,160,0.2);}
+.mes-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),transparent);opacity:0;}
+.mes-card.live::after{opacity:1;}
+.mc-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;}
+.mc-nome{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;}
+.mc-badge{font-family:'IBM Plex Mono',monospace;font-size:0.58rem;padding:2px 6px;border-radius:3px;letter-spacing:0.04em;}
+.mc-badge.live{background:rgba(0,229,160,0.1);color:var(--accent);border:1px solid rgba(0,229,160,0.2);}
+.mc-badge.est{background:rgba(90,106,128,0.15);color:var(--muted);border:1px solid rgba(90,106,128,0.2);}
+.mc-valor{font-family:'IBM Plex Mono',monospace;font-size:2rem;font-weight:500;line-height:1;margin-bottom:6px;}
+.mc-valor.pos{color:var(--accent);}
+.mc-valor.neg{color:var(--danger);}
+.mc-valor.loading{color:var(--muted);font-size:1rem;}
+.mc-full{font-size:0.68rem;color:var(--muted);line-height:1.35;margin-bottom:10px;}
+.mc-acum{display:flex;align-items:center;gap:6px;padding-top:10px;border-top:1px solid var(--border);}
+.mc-acum-label{font-family:'IBM Plex Mono',monospace;font-size:0.62rem;color:var(--muted);}
+.mc-acum-val{font-family:'IBM Plex Mono',monospace;font-size:0.78rem;color:var(--accent);font-weight:500;margin-left:auto;}
+.mc-src{font-family:'IBM Plex Mono',monospace;font-size:0.58rem;padding:1px 5px;border-radius:2px;font-size:0.57rem;letter-spacing:0.05em;}
+.src-bcb{background:rgba(0,144,255,0.1);color:var(--accent2);}
+.src-est{background:rgba(90,106,128,0.2);color:var(--muted);}
+/* Table */
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:0.82rem;}
+th{font-family:'IBM Plex Mono',monospace;font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);}
+td{padding:10px 14px;border-bottom:1px solid rgba(30,42,58,0.6);font-family:'IBM Plex Mono',monospace;font-size:0.78rem;}
+tr:hover td{background:rgba(255,255,255,0.02);}
+.val-pos{color:var(--accent);}
+.val-neg{color:var(--danger);}
+/* Form */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:600px){.form-grid{grid-template-columns:1fr;}}
+.field{display:flex;flex-direction:column;gap:6px;}
+label{font-family:'IBM Plex Mono',monospace;font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);}
+input,select{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:0.85rem;padding:10px 14px;outline:none;transition:border-color 0.2s;width:100%;}
+input:focus,select:focus{border-color:var(--accent);}
+select option{background:var(--surface2);}
+.btn{font-family:'Syne',sans-serif;font-weight:700;font-size:0.78rem;letter-spacing:0.08em;text-transform:uppercase;padding:11px 24px;border:none;border-radius:8px;cursor:pointer;transition:all 0.2s;}
+.btn-primary{background:var(--accent);color:#000;}
+.btn-primary:hover{background:#00ffb3;box-shadow:0 0 24px rgba(0,229,160,0.3);}
+.btn-outline{background:transparent;color:var(--accent);border:1px solid var(--accent);}
+.btn-outline:hover{background:rgba(0,229,160,0.08);}
+.btn-sm{padding:7px 14px;font-size:0.7rem;}
+.btn-group{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;}
+.resultado-box{background:linear-gradient(135deg,rgba(0,229,160,0.06),rgba(0,144,255,0.04));border:1px solid rgba(0,229,160,0.25);border-radius:12px;padding:28px;margin-top:24px;display:none;}
+.resultado-box.visible{display:block;animation:fadeIn 0.4s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.resultado-title{font-family:'IBM Plex Mono',monospace;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:20px;}
+.resultado-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px;}
+.resultado-item label{display:block;font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px;}
+.resultado-item .val{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:var(--accent);}
+.resultado-item .val.big{font-size:2rem;}
+.alert{border-radius:8px;padding:14px 18px;font-size:0.82rem;margin-bottom:16px;border-left:3px solid;line-height:1.5;}
+.alert-info{background:rgba(0,144,255,0.06);border-color:var(--accent2);color:#7ac4ff;}
+.alert-warn{background:rgba(255,184,0,0.06);border-color:var(--warning);color:#ffd966;}
+.alert-success{background:rgba(0,229,160,0.06);border-color:var(--accent);color:var(--accent);}
+.section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+.section-hdr h2{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;}
+/* Dashboard stats */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;margin-bottom:28px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;}
+.stat-label{font-family:'IBM Plex Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.stat-val{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;}
+.stat-val.green{color:var(--accent);}
+.stat-val.orange{color:var(--warning);}
+.stat-val.red{color:var(--danger);}
+.stat-val.blue{color:var(--accent2);}
+.stat-sub{font-size:0.68rem;color:var(--muted);margin-top:4px;font-family:'IBM Plex Mono',monospace;}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+@media(max-width:768px){.dash-grid{grid-template-columns:1fr;}}
+/* Timeline */
+.timeline{border-left:2px solid var(--border);padding-left:20px;margin-left:8px;}
+.timeline-item{position:relative;margin-bottom:18px;}
+.timeline-item::before{content:'';position:absolute;left:-26px;top:4px;width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);}
+.timeline-item.warn::before{background:var(--warning);box-shadow:0 0 8px var(--warning);}
+.timeline-item.danger::before{background:var(--danger);box-shadow:0 0 8px var(--danger);}
+.tl-date{font-family:'IBM Plex Mono',monospace;font-size:0.68rem;color:var(--muted);margin-bottom:3px;}
+.tl-text{font-size:0.85rem;}
+/* Contratos */
+.contrato-item{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:8px;display:flex;align-items:center;gap:12px;transition:all 0.2s;flex-wrap:wrap;}
+.contrato-item:hover{border-color:#2a3a50;}
+.contrato-id{font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:var(--accent);background:rgba(0,229,160,0.08);border:1px solid rgba(0,229,160,0.2);padding:3px 8px;border-radius:4px;white-space:nowrap;}
+.contrato-info{flex:1;min-width:0;}
+.contrato-nome{font-family:'Syne',sans-serif;font-weight:600;font-size:0.88rem;}
+.contrato-meta{font-size:0.68rem;color:var(--muted);margin-top:2px;font-family:'IBM Plex Mono',monospace;}
+.contrato-status{font-family:'IBM Plex Mono',monospace;font-size:0.65rem;padding:3px 8px;border-radius:4px;white-space:nowrap;}
+.status-vence{background:rgba(255,184,0,0.1);color:var(--warning);border:1px solid rgba(255,184,0,0.2);}
+.status-ok{background:rgba(0,229,160,0.08);color:var(--accent);border:1px solid rgba(0,229,160,0.2);}
+.status-atrasado{background:rgba(255,77,109,0.1);color:var(--danger);border:1px solid rgba(255,77,109,0.2);}
+/* Parametrico */
+.template-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;}
+.tmpl-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:18px;cursor:pointer;transition:all 0.2s;}
+.tmpl-card:hover{border-color:var(--accent);transform:translateY(-2px);}
+.tmpl-tag{font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--accent);background:rgba(0,229,160,0.08);border:1px solid rgba(0,229,160,0.15);padding:2px 8px;border-radius:3px;display:inline-block;margin-bottom:10px;}
+.tmpl-nome{font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem;margin-bottom:6px;}
+.tmpl-desc{font-size:0.72rem;color:var(--muted);line-height:1.5;}
+.param-row{display:grid;grid-template-columns:2fr 1fr 1fr 50px;gap:10px;margin-bottom:10px;align-items:end;}
+.remove-btn{background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.25);color:var(--danger);border-radius:6px;padding:10px;cursor:pointer;font-size:0.85rem;text-align:center;transition:all 0.2s;}
+.remove-btn:hover{background:rgba(255,77,109,0.25);}
+.formula-preview{font-family:'IBM Plex Mono',monospace;font-size:0.8rem;color:var(--muted);padding:12px 16px;background:rgba(0,0,0,0.2);border-radius:6px;margin-top:12px;min-height:40px;word-break:break-all;line-height:1.8;}
+.search-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+.search-bar input{flex:1;min-width:200px;}
+.search-bar select{width:180px;}
+/* Grafico simples */
+.chart-bar-wrap{display:flex;flex-direction:column;gap:8px;margin-top:8px;}
+.chart-row{display:flex;align-items:center;gap:10px;}
+.chart-label{font-family:'IBM Plex Mono',monospace;font-size:0.68rem;color:var(--muted);width:60px;text-align:right;flex-shrink:0;}
+.chart-bar-outer{flex:1;background:rgba(255,255,255,0.05);border-radius:3px;height:14px;overflow:hidden;}
+.chart-bar-inner{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width 0.8s cubic-bezier(.4,0,.2,1);}
+.chart-val{font-family:'IBM Plex Mono',monospace;font-size:0.68rem;color:var(--accent);width:48px;flex-shrink:0;}
+/* Refresh btn */
+.refresh-btn{font-family:'IBM Plex Mono',monospace;font-size:0.65rem;padding:5px 10px;border-radius:4px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:4px;}
+.refresh-btn:hover{border-color:var(--accent);color:var(--accent);}
+.last-update{font-family:'IBM Plex Mono',monospace;font-size:0.62rem;color:var(--muted);}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+</style>
+  <!-- Microsoft Authentication Library -->
+  <script src="https://alcdn.msauth.net/browser/2.38.2/js/msal-browser.min.js"></script>
+  <!-- SheetJS para ler .xlsx -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+<!-- Banner SharePoint -->
+<div id="sp-banner" style="display:none;align-items:center;gap:10px;padding:8px 24px;background:rgba(0,144,255,0.08);border-bottom:1px solid rgba(0,144,255,0.2);font-family:'IBM Plex Mono',monospace;font-size:0.7rem;">
+  <span id="sp-banner-dot" style="width:7px;height:7px;border-radius:50%;background:var(--warning);display:inline-block;"></span>
+  <span id="sp-banner-msg">Conectando ao SharePoint...</span>
+  <span style="margin-left:auto;color:var(--muted);">Base Comercial.xlsx · engelmigproject</span>
+</div>
+<header>
+  <div class="container">
+    <div class="header-inner">
+      <div class="logo"><img src="data:image/png;base64,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" alt="Engelmig Energia" style="height:32px;width:auto;display:block;"></div>
+      <div style="display:flex;flex-direction:column;gap:2px;">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;letter-spacing:-0.01em;color:var(--text);">Reajuste Contratual de Clientes</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;">Base Comercial</div>
+      </div>
+      <div class="header-badges">
+        <div class="hbadge" id="badge-bcb"><div class="dot"></div>BCB/SGS</div>
+        <div class="hbadge" id="badge-ibge"><div class="dot"></div>IBGE/SIDRA</div>
+      </div>
+    </div>
+  </div>
+</header>
+<div class="container">
+  <nav class="nav-tabs">
+    <button class="tab-btn active" onclick="showTab('dashboard',this)">Dashboard</button>
+    <button class="tab-btn" onclick="showTab('indices',this)">Índices ao Vivo</button>
+    <button class="tab-btn" onclick="showTab('calculadora',this)">Calculadora</button>
+    <button class="tab-btn" onclick="showTab('contratos',this)">Contratos</button>
+    <button class="tab-btn" onclick="showTab('formula',this)">Fórmulas Paramétricas</button>
+  </nav>
+
+  <!-- DASHBOARD -->
+  <div id="tab-dashboard" class="tab-content active">
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">Contratos Ativos</div><div class="stat-val blue">76</div><div class="stat-sub">Base Comercial</div></div>
+      <div class="stat-card"><div class="stat-label">Atrasados / Vencendo</div><div class="stat-val red">3</div><div class="stat-sub">+ 6 vencendo em 60 dias</div></div>
+      <div class="stat-card"><div class="stat-label">Em Dia</div><div class="stat-val green">67</div><div class="stat-sub">sem alerta</div></div>
+      <div class="stat-card"><div class="stat-label">Carteira Total</div><div class="stat-val green" style="font-size:1.4rem;">R$ 3,73bi</div><div class="stat-sub">contratos ativos</div></div>
+
+    </div>
+    <div class="dash-grid">
+      <div class="card">
+        <div class="card-title">Alertas — Vencimentos Críticos</div>
+        <div class="timeline">
+          <div class="timeline-item danger"><div class="tl-date">2026-01-14 · ATRASADO</div><div class="tl-text">4600004329 - UEN 811 — SAMARCO</div></div>
+<div class="timeline-item danger"><div class="tl-date">2026-02-28 · ATRASADO</div><div class="tl-text">OMEOL202500018 - 829 — RENOVA</div></div>
+<div class="timeline-item danger"><div class="tl-date">2026-03-01 · ATRASADO</div><div class="tl-text">2024 03 01- UEN 809 — PONTAL ENERGY</div></div>
+<div class="timeline-item warn"><div class="tl-date">2026-03-12 · em 2 dias</div><div class="tl-text">4600029508 - UEN 661 — EDP T</div></div>
+<div class="timeline-item warn"><div class="tl-date">2026-03-22 · em 12 dias</div><div class="tl-text">4600001984 - UEN 813 — AES TIETÊ</div></div>
+<div class="timeline-item warn"><div class="tl-date">2026-03-26 · em 16 dias</div><div class="tl-text">9830 - UEN 620 — MINERAÇÃO MARACÁ</div></div>
+<div class="timeline-item warn"><div class="tl-date">2026-04-30 · em 51 dias</div><div class="tl-text">46000009066 -UEN 615 — LIGHT</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <div class="card-title" style="margin-bottom:0">Índices — Últimos 12 Meses</div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span class="last-update" id="last-update-text"></span>
+            <button class="refresh-btn" onclick="carregarTodosIndices(true)">↻ Atualizar</button>
+          </div>
+        </div>
+        <div class="chart-bar-wrap" id="chart-indices">
+          <div style="color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:0.75rem;padding:20px 0;text-align:center;"><span class="loading-ring"></span>Buscando dados nas APIs…</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INDICES AO VIVO -->
+  <div id="tab-indices" class="tab-content">
+    <div class="section-hdr">
+      <h2>Índices ao Vivo</h2>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <span class="last-update" id="indices-update-text"></span>
+        <button class="refresh-btn" onclick="carregarTodosIndices(true)">↻ Atualizar dados</button>
+      </div>
+    </div>
+    <div id="alert-indices-status"></div>
+
+    <!-- CARDS DO MÊS -->
+    <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px;">
+      <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:0.78rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);">Variação Mensal</span>
+      <span id="periodo-label" style="font-family:'IBM Plex Mono',monospace;font-size:0.68rem;color:var(--accent);background:rgba(0,229,160,0.08);border:1px solid rgba(0,229,160,0.15);padding:2px 8px;border-radius:3px;">carregando…</span>
+    </div>
+    <div class="mes-cards-grid" id="mes-cards-grid">
+      <!-- preenchido por JS -->
+    </div>
+
+    <!-- TABELA HISTÓRICA -->
+    <div class="card" style="margin-top:8px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+        <div class="card-title" style="margin-bottom:0;">Histórico Mensal — Últimos 14 Meses</div>
+        <span id="hist-status" class="data-status loading"><span class="loading-ring"></span>carregando…</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Mês/Ano</th>
+              <th>IPCA<br><span style="font-weight:400;color:var(--muted);font-size:0.6rem">mensal</span></th>
+              <th>IPCA<br><span style="font-weight:400;color:var(--muted);font-size:0.6rem">acum. 12m</span></th>
+              <th>INPC<br><span style="font-weight:400;color:var(--muted);font-size:0.6rem">mensal</span></th>
+              <th>IGP-M<br><span style="font-weight:400;color:var(--muted);font-size:0.6rem">mensal</span></th>
+              <th>Selic<br><span style="font-weight:400;color:var(--muted);font-size:0.6rem">meta a.a.</span></th>
+            </tr>
+          </thead>
+          <tbody id="tabela-historico"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALCULADORA -->
+  <div id="tab-calculadora" class="tab-content">
+    <div id="alert-calc-live" class="alert alert-info" style="display:none"></div>
+
+    <div class="card">
+      <div class="card-title">Calculadora de Reajuste</div>
+
+      <!-- LINHA 1: Contrato + Valor -->
+      <div class="form-grid">
+        <div class="field">
+          <label>Contrato</label>
+          <select id="calc-contrato-sel" onchange="preencherContrato()">
+            <option value="">-- selecione um contrato --</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Valor Base (R$)</label>
+          <input type="number" id="calc-valor" placeholder="100000.00" step="0.01">
+        </div>
+      </div>
+
+      <!-- CLÁUSULA — aparece ao selecionar contrato -->
+      <div id="clausula-box" style="display:none;margin-bottom:16px;">
+        <div style="background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--accent2);border-radius:8px;padding:12px 16px;display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;">
+          <div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;">Cláusula de Reajuste</div>
+            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:var(--accent2);" id="clausula-val">—</div>
+          </div>
+          <div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;">Mês de Reajuste (contrato)</div>
+            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:var(--text);" id="clausula-mes">—</div>
+          </div>
+          <div id="clausula-reaj-wrap" style="display:none;flex-basis:100%;margin-top:8px;">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;">Fórmula de Reajuste</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:0.78rem;color:var(--warning);line-height:1.7;white-space:pre-wrap;" id="clausula-reaj">—</div>
+          </div>
+          <div id="clausula-obs-wrap" style="display:none;">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;">Observação</div>
+            <div style="font-family:'IBM Plex Sans',sans-serif;font-size:0.82rem;color:var(--warning);" id="clausula-obs">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LINHA 2: Índice + % + Mês -->
+      <div class="form-grid">
+        <div class="field">
+          <label>Índice de Reajuste</label>
+          <select id="calc-indice" onchange="onIndiceChange()">
+            <option value="">-- selecione --</option>
+            <optgroup label="─── Ao Vivo (BCB) ───">
+              <option value="ipca_12m" id="opt-ipca-12m">IPCA – acumulado 12m</option>
+              <option value="ipca_mes" id="opt-ipca-mes">IPCA – último mês</option>
+              <option value="igpm_12m" id="opt-igpm-12m">IGP-M – acumulado 12m</option>
+              <option value="igpm_mes" id="opt-igpm-mes">IGP-M – último mês</option>
+              <option value="inpc_12m" id="opt-inpc-12m">INPC – acumulado 12m</option>
+              <option value="inpc_mes" id="opt-inpc-mes">INPC – último mês</option>
+              <option value="selic"    id="opt-selic">Selic – meta anual</option>
+            </optgroup>
+            <optgroup label="─── Estimados ───">
+              <option value="incc">INCC – acumulado 12m (est.)</option>
+              <option value="igpdi">IGP-DI – acumulado 12m (est.)</option>
+              <option value="sinapi">SINAPI – acumulado 12m (est.)</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="field">
+          <label style="display:flex;align-items:center;gap:8px;">
+            Percentual de Reajuste (%)
+            <span id="calc-perc-fonte" style="font-size:0.6rem;padding:1px 6px;border-radius:3px;background:rgba(0,229,160,0.1);color:var(--accent);border:1px solid rgba(0,229,160,0.2);display:none;"></span>
+          </label>
+          <div style="position:relative;">
+            <input type="number" id="calc-perc" placeholder="0,00" step="0.01"
+              style="padding-right:36px;"
+              oninput="document.getElementById('calc-perc-fonte').style.display='none';this.placeholder='0,00';">
+            <span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-family:'IBM Plex Mono',monospace;font-size:0.85rem;color:var(--muted);pointer-events:none;">%</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Mês de Aplicação do Reajuste</label>
+          <select id="calc-mes-aplicacao" onchange="_recalcPerc()">
+            <option value="">-- selecione o mês --</option>
+            <option value="Janeiro">Janeiro</option>
+            <option value="Fevereiro">Fevereiro</option>
+            <option value="Março">Março</option>
+            <option value="Abril">Abril</option>
+            <option value="Maio">Maio</option>
+            <option value="Junho">Junho</option>
+            <option value="Julho">Julho</option>
+            <option value="Agosto">Agosto</option>
+            <option value="Setembro">Setembro</option>
+            <option value="Outubro">Outubro</option>
+            <option value="Novembro">Novembro</option>
+            <option value="Dezembro">Dezembro</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="calcularReajuste()">Calcular</button>
+        <button class="btn btn-outline" onclick="limparCalc()">Limpar</button>
+      </div>
+
+      <div class="resultado-box" id="resultado-calc">
+        <div class="resultado-title">// RESULTADO</div>
+        <div class="resultado-grid">
+          <div class="resultado-item"><label>Valor Base</label><div class="val" id="res-base">—</div></div>
+          <div class="resultado-item"><label>Índice Aplicado</label><div class="val" id="res-indice">—</div></div>
+          <div class="resultado-item"><label>Incremento (R$)</label><div class="val" id="res-incremento">—</div></div>
+          <div class="resultado-item"><label>Novo Valor</label><div class="val big" id="res-novo">—</div></div>
+          <div class="resultado-item"><label>Mês de Aplicação</label><div class="val" id="res-mes">—</div></div>
+        </div>
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:var(--muted);" id="res-obs"></div>
+        <div style="margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:0.62rem;color:var(--muted);" id="res-fonte"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTRATOS -->
+  <div id="tab-contratos" class="tab-content">
+    <div class="section-hdr">
+      <h2>Contratos Ativos — Base Comercial</h2>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:var(--muted);" id="count-label">76 contratos</span>
+    </div>
+    <div class="search-bar">
+      <input id="search-input" placeholder="Buscar por cliente, contrato, UEN..." oninput="filtrarContratos()">
+      <select id="filter-status" onchange="filtrarContratos()">
+        <option value="">Todos os status</option>
+        <option value="atrasado">Atrasados</option>
+        <option value="vence">Vencendo</option>
+        <option value="ok">Em dia</option>
+      </select>
+      <select id="filter-diretoria" onchange="filtrarContratos()">
+        <option value="">Todas as diretorias</option>
+        <option value="RD">RD</option>
+        <option value="GT">GT</option>
+      </select>
+    </div>
+    <div id="lista-contratos"></div>
+  </div>
+
+  <!-- FORMULAS -->
+  <div id="tab-formula" class="tab-content">
+    <div class="alert alert-warn">⚙️ Média ponderada por componente. Os índices abaixo são alimentados automaticamente pelas APIs do BCB/IBGE.</div>
+    <div class="card">
+      <div class="card-title">Construtor de Fórmula Paramétrica</div>
+      <div class="form-grid" style="margin-bottom:16px;">
+        <div class="field"><label>Nome / Contrato</label><input id="fp-nome" placeholder="Ex.: CEMIG - 4680007360" oninput="updateFormula()"></div>
+        <div class="field"><label>Valor Base (R$)</label><input id="fp-valor" type="number" step="0.01" placeholder="1000000.00"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr 50px;gap:10px;margin-bottom:6px;padding:0 2px;">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;">Componente</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;">Índice</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;">Peso (%)</span>
+        <span></span>
+      </div>
+      <div id="params-container"></div>
+      <button class="btn btn-outline" style="margin-top:12px;margin-bottom:16px;" onclick="addParam()">+ Adicionar Componente</button>
+      <div class="card-title" style="margin-top:8px;">Preview da Fórmula</div>
+      <div class="formula-preview" id="formula-preview">Adicione componentes para gerar a fórmula…</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:var(--muted);margin-top:8px;" id="peso-total">Total dos pesos: <span style="color:var(--warning)">0%</span></div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="calcularParametrico()">Calcular Reajuste Paramétrico</button>
+        <button class="btn btn-outline" onclick="limparParametrico()">Limpar</button>
+      </div>
+      <div class="resultado-box" id="resultado-parametrico">
+        <div class="resultado-title">// REAJUSTE PARAMÉTRICO</div>
+        <div id="resultado-param-conteudo"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Modelos Prontos</div>
+      <div class="template-grid">
+        <div class="tmpl-card" onclick="loadTemplate('construcao')"><div class="tmpl-tag">CONSTRUÇÃO CIVIL</div><div class="tmpl-nome">Obras e Edificações</div><div class="tmpl-desc">MO 60% INCC · Materiais 30% IPCA · Equipamentos 10% IGP-M</div></div>
+        <div class="tmpl-card" onclick="loadTemplate('servicos')"><div class="tmpl-tag">SERVIÇOS</div><div class="tmpl-nome">Limpeza / Vigilância</div><div class="tmpl-desc">Mão de Obra 80% INPC · Insumos 20% IPCA</div></div>
+        <div class="tmpl-card" onclick="loadTemplate('ti')"><div class="tmpl-tag">TI / TECNOLOGIA</div><div class="tmpl-nome">Software e Suporte</div><div class="tmpl-desc">Licenças 50% IPCA · Mão de Obra 50% IGP-M</div></div>
+        <div class="tmpl-card" onclick="loadTemplate('manutencao')"><div class="tmpl-tag">MANUTENÇÃO</div><div class="tmpl-nome">Manutenção Industrial</div><div class="tmpl-desc">Peças 40% IGP-DI · MO 40% INCC · Transporte 20% IPCA</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DADOS DOS CONTRATOS
+// ============================================================
+const CONTRATOS = [{"id": "10", "uen": "136", "diretoria": "RD", "cliente": "COELBA", "contrato": "4600033089 - UEN 136", "contratoCliente": "4600033089", "linhaNegocios": "CCM/STC", "mesReajuste": "Setembro", "clausula": "14.3", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 125170498.98, "dataInicio": "2014-09-01", "dataTerminoAdtv": "2026-06-30", "vigenciaMeses": "141", "status": "ok", "indiceSugerido": "ipca_12m", "reajuste": "IPCA"}, {"id": "38", "uen": "186, 187, 188,190", "diretoria": "RD", "cliente": "ENERGISA MS", "contrato": "2020.0101.01/2020.01", "contratoCliente": "2020.0101.01/2020.0102.01\nWS 70924", "linhaNegocios": "CCM/STC", "mesReajuste": "Novembro", "clausula": "TAC02", "obs": "Conforme TAC04", "tipoContratacao": "Contrato Contínuo", "valorTotal": 164989060.22, "dataInicio": "2020-05-01", "dataTerminoAdtv": "2026-07-31", "vigenciaMeses": "74", "status": "ok", "indiceSugerido": "", "reajuste": "P = PO + PO x (40% x MO + 10% x ME + 5% x CO + 45% x IPCA).\n\nPO = Preço data base – Data base: 01/11/2019\nMO = Mão de obra – INCC – DI = código 160906, FGV;\nME =  Índice de Bens de Produção, Máquinas e Equipamentos - Coluna 15 - FGV\nCO = Combustível e lubrificantes = Índice de variação de bens intermediários - combustíveis e lubrificantes para produção, da FGV, código 1004820.\nIPCA = Índice Nacional de Preços ao Consumidor Amplo."}, {"id": "71", "uen": "813", "diretoria": "GT", "cliente": "AES TIETÊ", "contrato": "4600001984 - UEN 813", "contratoCliente": "4600001984", "linhaNegocios": "O&M", "mesReajuste": "Março", "clausula": "V - 3º", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 5518831.65, "dataInicio": "2021-03-22", "dataTerminoAdtv": "2026-03-22", "vigenciaMeses": "60", "status": "vence", "indiceSugerido": "", "reajuste": ""}, {"id": "74", "uen": "110, 111, 112, 121, 122, 123, 125, 126, 127", "diretoria": "RD", "cliente": "EDP ES", "contrato": "0002/2021", "contratoCliente": "0002/2021; 4600027185; 4600027205; 4600027207", "linhaNegocios": "CCM/STC", "mesReajuste": "Junho", "clausula": "TAC 01", "obs": "Conforme TAC01", "tipoContratacao": "Contrato Contínuo", "valorTotal": 288681494.91, "dataInicio": "2021-06-01", "dataTerminoAdtv": "2026-06-30", "vigenciaMeses": "60", "status": "ok", "indiceSugerido": "ipca_12m", "reajuste": "IPCA"}, {"id": "75", "uen": "635", "diretoria": "GT", "cliente": "EDP ES", "contrato": "4600027342 - UEN 635", "contratoCliente": "4600027342", "linhaNegocios": "MANUTENÇÃO", "mesReajuste": "Junho", "clausula": "4.4", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 19073141.57, "dataInicio": "2021-06-22", "dataTerminoAdtv": "2026-06-30", "vigenciaMeses": "60", "status": "ok", "indiceSugerido": "", "reajuste": ""}, {"id": "77", "uen": "822", "diretoria": "GT", "cliente": "RENOVA", "contrato": "OMEOL201600017", "contratoCliente": "OMEOL201600017", "linhaNegocios": "O&M", "mesReajuste": "Outubro", "clausula": "TAC01 - 11.1.4", "obs": "Conforme TAC01", "tipoContratacao": "Contrato Contínuo", "valorTotal": 20899620.0, "dataInicio": "2021-10-01", "dataTerminoAdtv": "2026-10-01", "vigenciaMeses": "60", "status": "ok", "indiceSugerido": "", "reajuste": ""}, {"id": "79", "uen": "202", "diretoria": "RD", "cliente": "CEMIG", "contrato": "4680006675 - UEN 202", "contratoCliente": "4680006675", "linhaNegocios": "STC", "mesReajuste": "Agosto", "clausula": "6", "obs": "Quem faz a solicitação é a REMO", "tipoContratacao": "Contrato Contínuo", "valorTotal": 120371794.55, "dataInicio": "2022-07-01", "dataTerminoAdtv": "2027-07-01", "vigenciaMeses": "60", "status": "ok", "indiceSugerido": "", "reajuste": ""}, {"id": "86", "uen": "620", "diretoria": "GT", "cliente": "BRASKEM", "contrato": "4800004599 - UEN 620", "contratoCliente": "4800004599", "linhaNegocios": "MANUTENÇÃO", "mesReajuste": "Maio", "clausula": "F.2.2", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 21739303.66, "dataInicio": "2022-05-01", "dataTerminoAdtv": "2028-05-01", "vigenciaMeses": "72", "status": "ok", "indiceSugerido": "ipca_12m", "reajuste": "IPCA"}, {"id": "87", "uen": "811", "diretoria": "GT", "cliente": "SAMARCO", "contrato": "4600003379 - UEN 811", "contratoCliente": "4600003379", "linhaNegocios": "O&M", "mesReajuste": "Maio", "clausula": "9", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 58054501.28, "dataInicio": "2022-07-01", "dataTerminoAdtv": "2026-06-30", "vigenciaMeses": "47", "status": "ok", "indiceSugerido": "", "reajuste": ""}, {"id": "89", "uen": "203", "diretoria": "RD", "cliente": "CEMIG", "contrato": "4680006646 - UEN 203", "contratoCliente": "4680006646", "linhaNegocios": "CCM", "mesReajuste": "Maio", "clausula": "6", "obs": "Solicitar dia 16/04", "tipoContratacao": "Contrato Contínuo", "valorTotal": 113834000.0, "dataInicio": "2022-08-05", "dataTerminoAdtv": "2027-08-04", "vigenciaMeses": "59", "status": "ok", "indiceSugerido": "ipca_12m", "reajuste": "IPCA"}, {"id": "90", "uen": "615", "diretoria": "RD", "cliente": "LIGHT", "contrato": "46000009066 -UEN 615", "contratoCliente": "4600009066", "linhaNegocios": "MANUTENÇÃO", "mesReajuste": "Junho", "clausula": "12", "obs": "Se não solicitar no prazo, não consegue retroativo", "tipoContratacao": "Contrato Contínuo", "valorTotal": 5798315.95, "dataInicio": "2022-06-03", "dataTerminoAdtv": "2026-04-30", "vigenciaMeses": "46", "status": "vence", "indiceSugerido": "ipca_12m", "reajuste": "IPCA"}, {"id": "91", "uen": "661", "diretoria": "GT", "cliente": "EDP T", "contrato": "4600029508 - UEN 661", "contratoCliente": "4600029508", "linhaNegocios": "MANUTENÇÃO", "mesReajuste": "Julho", "clausula": "5.1", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 2612650.0, "dataInicio": "2022-09-04", "dataTerminoAdtv": "2026-03-12", "vigenciaMeses": "42", "status": "vence", "indiceSugerido": "ipca_12m", "reajuste": "IPCA"}, {"id": "92", "uen": "660", "diretoria": "GT", "cliente": "EDP T", "contrato": "4600029518 - UEN 660", "contratoCliente": "4600029518", "linhaNegocios": "MANUTENÇÃO", "mesReajuste": "Julho", "clausula": "5.1", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 8639816.7, "dataInicio": "2022-08-31", "dataTerminoAdtv": "2026-05-31", "vigenciaMeses": "45", "status": "ok", "indiceSugerido": "ipca_12m", "reajuste": "IPCA"}, {"id": "93", "uen": "620", "diretoria": "GT", "cliente": "KINROSS", "contrato": "SPOT", "contratoCliente": "133268-B2", "linhaNegocios": "MANUTENÇÃO", "mesReajuste": "Janeiro", "clausula": "5", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 1500000.0, "dataInicio": "2021-05-24", "dataTerminoAdtv": "2026-04-30", "vigenciaMeses": "59", "status": "vence", "indiceSugerido": "", "reajuste": ""}, {"id": "98", "uen": "620", "diretoria": "GT", "cliente": "MINERAÇÃO MARACÁ", "contrato": "9830 - UEN 620", "contratoCliente": "9830", "linhaNegocios": "MANUTENÇÃO", "mesReajuste": "Março", "clausula": "VIII", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 882822.5, "dataInicio": "2023-03-27", "dataTerminoAdtv": "2026-03-26", "vigenciaMeses": "35", "status": "vence", "indiceSugerido": "", "reajuste": ""}, {"id": "102", "uen": "825", "diretoria": "GT", "cliente": "ALIANÇA", "contrato": "84895 - UEN 825", "contratoCliente": "84895", "linhaNegocios": "O&M", "mesReajuste": "Maio", "clausula": "14.4.1", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 8815920.0, "dataInicio": "2023-07-28", "dataTerminoAdtv": "2028-07-28", "vigenciaMeses": "60", "status": "ok", "indiceSugerido": "", "reajuste": ""}, {"id": "104", "uen": "176", "diretoria": "RD", "cliente": "CPFL", "contrato": "CW2326043 - UEN 176", "contratoCliente": "CW2326043", "linhaNegocios": "LEITURA", "mesReajuste": "Janeiro", "clausula": "6.2", "obs": "Primeiro Reaj. Em Janeiro", "tipoContratacao": "Contrato Contínuo", "valorTotal": 41330807.34, "dataInicio": "2024-01-01", "dataTerminoAdtv": "2028-01-01", "vigenciaMeses": "48", "status": "ok", "indiceSugerido": "", "reajuste": "PR = Po. [0,62. (MO) + 0,18 (BM) + 0,10  (PI27i/PI27o) + 0,10 (IPCi/0PCo)] \nPr = Preço reajustado;  \nPo = Preço inicial do contrato;  \nMO = Índice para Mão-de-Obra de Leitura e Entrega (Último Acordo Coletivo da Categoria);  \nBM = Variação média dos benefícios de Leitura e Entrega (Cesta básica, vale- refeição, PLR) entre o \núltimo Acordo coletivo da Categoria e o seu respectivo anterior. PI27 = Produtos Industrializados;  \nIPC (FIPE) = Índice de Preços ao Consumidor para cálculo da variação dos custos administrativos.  \ni = Índices básicos referentes ao 1º mês anterior a data do reajuste.\no = índices básicos referentes ao 1º mês anterior a data da assinatura do contrato, ou do último \nreajuste aplicado.  \nIo = índices básicos referentes ao 1º mês anterior à data base;  \nIi = índices básicos referentes ao 1º mês anterior à data do reajuste.  \nPreço base = é o preço da base econômica da proposta que é abril/2023;"}, {"id": "105", "uen": "177", "diretoria": "RD", "cliente": "CPFL", "contrato": "CW2326040 - UEN 177", "contratoCliente": "CW2326040", "linhaNegocios": "LEITURA", "mesReajuste": "Janeiro", "clausula": "6.2", "obs": "Primeiro Reaj. Em Janeiro", "tipoContratacao": "Contrato Contínuo", "valorTotal": 33273307.55, "dataInicio": "2024-01-01", "dataTerminoAdtv": "2028-01-01", "vigenciaMeses": "48", "status": "ok", "indiceSugerido": "", "reajuste": "PR = Po. [0,62. (MO) + 0,18 (BM) + 0,10  (PI27i/PI27o) + 0,10 (IPCi/0PCo)] \nPr = Preço reajustado;  \nPo = Preço inicial do contrato;  \nMO = Índice para Mão-de-Obra de Leitura e Entrega (Último Acordo Coletivo da Categoria);  \nBM = Variação média dos benefícios de Leitura e Entrega (Cesta básica, vale- refeição, PLR) entre o \núltimo Acordo coletivo da Categoria e o seu respectivo anterior. PI27 = Produtos Industrializados;  \nIPC (FIPE) = Índice de Preços ao Consumidor para cálculo da variação dos custos administrativos.  \ni = Índices básicos referentes ao 1º mês anterior a data do reajuste.\no = índices básicos referentes ao 1º mês anterior a data da assinatura do contrato, ou do último \nreajuste aplicado.  \nIo = índices básicos referentes ao 1º mês anterior à data base;  \nIi = índices básicos referentes ao 1º mês anterior à data do reajuste.  \nPreço base = é o preço da base econômica da proposta que é abril/2023;"}, {"id": "106", "uen": "175", "diretoria": "RD", "cliente": "CPFL", "contrato": "CW2325894 - UEN 175", "contratoCliente": "CW2325894", "linhaNegocios": "LEITURA", "mesReajuste": "Janeiro", "clausula": "6.2", "obs": "Primeiro Reaj. Em Janeiro", "tipoContratacao": "Contrato Contínuo", "valorTotal": 50701411.28, "dataInicio": "2023-11-01", "dataTerminoAdtv": "2027-11-01", "vigenciaMeses": "48", "status": "ok", "indiceSugerido": "", "reajuste": ""}, {"id": "109", "uen": "191", "diretoria": "RD", "cliente": "ENERGISA MS", "contrato": "WS99093 - UEN 191", "contratoCliente": "WS 99093", "linhaNegocios": "STC", "mesReajuste": "Outubro", "clausula": "reajuste", "obs": "Página 2", "tipoContratacao": "Contrato Contínuo", "valorTotal": 16364448.0, "dataInicio": "2024-01-01", "dataTerminoAdtv": "2027-12-31", "vigenciaMeses": "47", "status": "ok", "indiceSugerido": "", "reajuste": "P = PO + PO x (40% x MO + 10% x ME + 5% x DI + 45% x IPCA).\n\nPO = Preço data base – Data base: assinatura do contrato;\nMO = Mão de obra – INCC – DI = código 160906, FGV;\nME = IPA-EP-DI Máquinas, aparelhos e equipamentos – código 1416650, FGV\nDI = Diesel S-10 = Variação preço médio revenda, Centro Oeste, ANP (https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos/precos-revenda-e-de-distribuicao-combustiveis/serie-historica-do-levantamento-de-precos);\nIPCA = Índice Nacional de Preços ao Consumidor Amplo."}, {"id": "110", "uen": "192, 193, 194, 195", "diretoria": "RD", "cliente": "ENERGISA MS", "contrato": "WS99091 - LESTE/SUL", "contratoCliente": "Nº WS 99091", "linhaNegocios": "LEITURA/STC", "mesReajuste": "Setembro", "clausula": "reajuste", "obs": "Página 2", "tipoContratacao": "Contrato Contínuo", "valorTotal": 156331193.94, "dataInicio": "2024-01-01", "dataTerminoAdtv": "2028-12-31", "vigenciaMeses": "59", "status": "ok", "indiceSugerido": "", "reajuste": ""}, {"id": "114", "uen": "215", "diretoria": "RD", "cliente": "CEMIG", "contrato": "4680007176 - UEN 215", "contratoCliente": "4680007176", "linhaNegocios": "LEITURA", "mesReajuste": "Novembro", "clausula": "CLÁUSULA 6 - DO REAJUSTE", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 66033097.25, "dataInicio": "2024-06-01", "dataTerminoAdtv": "2029-06-01", "vigenciaMeses": "60", "status": "ok", "indiceSugerido": "", "reajuste": ""}, {"id": "117", "uen": "668", "diretoria": "GT", "cliente": "EDP T", "contrato": "5600004663 - UEN 668", "contratoCliente": "5600004663", "linhaNegocios": "MANUTENÇÃO", "mesReajuste": "Fevereiro", "clausula": "5", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 5046134.28, "dataInicio": "2024-03-18", "dataTerminoAdtv": "2027-03-18", "vigenciaMeses": "36", "status": "ok", "indiceSugerido": "", "reajuste": "P = PO + PO x (40% x MO + 10% x ME + 5% x DI + 45% x IPCA).\n\nPO = Preço data base – Data base: assinatura do contrato;\nMO = Mão de obra – INCC – DI = código 160906, FGV;\nME = IPA-EP-DI Máquinas, aparelhos e equipamentos – código 1416650, FGV\nDI = Diesel S-10 = Variação preço médio revenda, Centro Oeste, ANP (https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos/precos-revenda-e-de-distribuicao-combustiveis/serie-historica-do-levantamento-de-precos);\nIPCA = Índice Nacional de Preços ao Consumidor Amplo."}, {"id": "118", "uen": "196", "diretoria": "RD", "cliente": "ENERGISA MS", "contrato": "WS100002 - UEN 196", "contratoCliente": "WS 100.002", "linhaNegocios": "STC", "mesReajuste": "Fevereiro", "clausula": "REAJUSTE", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 11289071.96, "dataInicio": "2024-03-01", "dataTerminoAdtv": "2028-02-29", "vigenciaMeses": "47", "status": "ok", "indiceSugerido": "ipca_12m", "reajuste": "IPCA"}, {"id": "119", "uen": "809", "diretoria": "GT", "cliente": "PONTAL ENERGY", "contrato": "2024 03 01- UEN 809", "contratoCliente": "2024-03-01-CPS-ECA-ECD", "linhaNegocios": "O&M", "mesReajuste": "", "clausula": "", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 0, "dataInicio": "2024-03-01", "dataTerminoAdtv": "2026-03-01", "vigenciaMeses": "24", "status": "atrasado", "indiceSugerido": "", "reajuste": ""}, {"id": "121", "uen": "902", "diretoria": "GT", "cliente": "ANGLO AMERICAN", "contrato": "4600036723 - UEN 902", "contratoCliente": "4600036723", "linhaNegocios": "INDÚSTRIA", "mesReajuste": "", "clausula": "", "obs": "", "tipoContratacao": "Execução de Projeto", "valorTotal": 7632000.0, "dataInicio": "2024-03-28", "dataTerminoAdtv": "2026-06-30", "vigenciaMeses": "27", "status": "ok", "indiceSugerido": "ipca_12m", "reajuste": "IPCA"}, {"id": "122", "uen": "670", "diretoria": "GT", "cliente": "CTEEP", "contrato": "4600008708 - UEN 670", "contratoCliente": "4600008708", "linhaNegocios": "MANUTENÇÃO", "mesReajuste": "Abril", "clausula": "3.5.1", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 8955361.59, "dataInicio": "2024-04-11", "dataTerminoAdtv": "2027-04-11", "vigenciaMeses": "36", "status": "ok", "indiceSugerido": "", "reajuste": "Índice do reajuste: Os preços unitários poderão ser \nreajustados 12 (doze) meses da data de início do Contrato, \nconforme composição abaixo:  \na) 70% (setenta por cento) do dissídio da categoria \n(Sindicato): SINTRACOM SUDOESTE; e  \nb) 30% (trinta por cento) do Índice Nacional de Preços ao \nConsumidor Amplo - IPCA."}, {"id": "123", "uen": "620", "diretoria": "GT", "cliente": "ATLANCTIC NICKEL", "contrato": "4375 - UEN 620", "contratoCliente": "4375", "linhaNegocios": "MANUTENÇÃO", "mesReajuste": "Abril", "clausula": "5.1(e)", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 1024929.0, "dataInicio": "2024-04-22", "dataTerminoAdtv": "2026-06-22", "vigenciaMeses": "26", "status": "ok", "indiceSugerido": "", "reajuste": ""}, {"id": "126", "uen": "826", "diretoria": "GT", "cliente": "MATRIX", "contrato": "S/N - UEN 826", "contratoCliente": "S/N - UEN 826", "linhaNegocios": "O&M", "mesReajuste": "Maio", "clausula": "", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 2334936.0, "dataInicio": "2024-06-15", "dataTerminoAdtv": "2026-06-15", "vigenciaMeses": "24", "status": "ok", "indiceSugerido": "ipca_12m", "reajuste": "IPCA"}, {"id": "127", "uen": "106, 107", "diretoria": "RD", "cliente": "EDP ES", "contrato": "5600005071 - 106/107", "contratoCliente": "5600005071", "linhaNegocios": "LEITURA", "mesReajuste": "Julho", "clausula": "3.4", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 54674596.23, "dataInicio": "2024-08-01", "dataTerminoAdtv": "2027-08-01", "vigenciaMeses": "36", "status": "ok", "indiceSugerido": "", "reajuste": ""}, {"id": "130", "uen": "647, 648, 649", "diretoria": "GT", "cliente": "EQUATORIAL", "contrato": "00249/2024-EQUATORIA", "contratoCliente": "00249/2024", "linhaNegocios": "MANUTENÇÃO", "mesReajuste": "Maio", "clausula": "4ª - Parágrafo Terceiro", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 29320802.0, "dataInicio": "2024-05-31", "dataTerminoAdtv": "2027-05-31", "vigenciaMeses": "36", "status": "ok", "indiceSugerido": "", "reajuste": "P = PO + PO x (40% x MO + 10% x ME + 5% x DI + 45% x IPCA).\n\nPO = Preço data base – Data base: assinatura do contrato;\nMO = Mão de obra – INCC – DI = código 160906, FGV;\nME = IPA-EP-DI Máquinas, aparelhos e equipamentos – código 1416650, FGV\nDI = Diesel S-10 = Variação preço médio revenda, Centro Oeste, ANP (https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos/precos-revenda-e-de-distribuicao-combustiveis/serie-historica-do-levantamento-de-precos);\nIPCA = Índice Nacional de Preços ao Consumidor Amplo."}, {"id": "131", "uen": "199", "diretoria": "RD", "cliente": "EMT", "contrato": "WS 101102 - UEN 199", "contratoCliente": "101102", "linhaNegocios": "STC", "mesReajuste": "", "clausula": "", "obs": "Não terá reajuste, visto que o contrato é 12 meses", "tipoContratacao": "Contrato Contínuo", "valorTotal": 35019844.2, "dataInicio": "2024-07-01", "dataTerminoAdtv": "2026-12-31", "vigenciaMeses": "29", "status": "ok", "indiceSugerido": "", "reajuste": ""}, {"id": "133", "uen": "280", "diretoria": "RD", "cliente": "ENERGISA MS", "contrato": "WS 101284 - UEN 280", "contratoCliente": "WS 101284", "linhaNegocios": "CCM", "mesReajuste": "Junho", "clausula": "REAJUSTE", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 32895689.75, "dataInicio": "2024-06-17", "dataTerminoAdtv": "2029-06-16", "vigenciaMeses": "59", "status": "ok", "indiceSugerido": "ipca_12m", "reajuste": "IPCA"}, {"id": "134", "uen": "827", "diretoria": "GT", "cliente": "MATRIX", "contrato": "S/N - UEN 827", "contratoCliente": "S/N - UEN 827", "linhaNegocios": "O&M", "mesReajuste": "Abril", "clausula": "Proposta", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 1379856.0, "dataInicio": "2024-09-02", "dataTerminoAdtv": "2026-09-02", "vigenciaMeses": "24", "status": "ok", "indiceSugerido": "", "reajuste": "I = 1 + (0,66 INPC + 0,10 CL + 0,24 E)"}, {"id": "135", "uen": "211", "diretoria": "RD", "cliente": "CEMIG", "contrato": "4680007360 - UEN 211", "contratoCliente": "4680007360", "linhaNegocios": "STC", "mesReajuste": "Junho", "clausula": "CLÁUSULA 6 - DO REAJUSTE", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 185060839.47, "dataInicio": "2024-10-15", "dataTerminoAdtv": "2029-10-15", "vigenciaMeses": "60", "status": "ok", "indiceSugerido": "", "reajuste": ""}, {"id": "137", "uen": "904", "diretoria": "GT", "cliente": "CSN", "contrato": "CW2336778 - UEN 904", "contratoCliente": "CW2336778", "linhaNegocios": "INDÚSTRIA", "mesReajuste": "Agosto", "clausula": "Anexo II", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 3895335.0, "dataInicio": "2024-08-01", "dataTerminoAdtv": "2027-08-01", "vigenciaMeses": "36", "status": "ok", "indiceSugerido": "ipca_12m", "reajuste": "IPCA"}, {"id": "138", "uen": "828", "diretoria": "GT", "cliente": "CASA DOS VENTOS", "contrato": "4600201947 - UEN 828", "contratoCliente": "4600201947", "linhaNegocios": "O&M", "mesReajuste": "Julho", "clausula": "4.3", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 0, "dataInicio": "2024-07-30", "dataTerminoAdtv": "2026-07-30", "vigenciaMeses": "24", "status": "ok", "indiceSugerido": "ipca_12m", "reajuste": "IPCA"}, {"id": "139", "uen": "828", "diretoria": "GT", "cliente": "CASA DOS VENTOS", "contrato": "4600201948 - UEN 828", "contratoCliente": "4600201948", "linhaNegocios": "O&M", "mesReajuste": "Julho", "clausula": "4.3", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 0, "dataInicio": "2024-07-30", "dataTerminoAdtv": "2026-07-30", "vigenciaMeses": "24", "status": "ok", "indiceSugerido": "ipca_12m", "reajuste": "IPCA"}, {"id": "141", "uen": "672", "diretoria": "GT", "cliente": "SANTO ANTONIO ENERGIA", "contrato": "CT.GMA.024.2024 -672", "contratoCliente": "CT.GMA.024.2024", "linhaNegocios": "MANUTENÇÃO", "mesReajuste": "Outubro", "clausula": "4.3", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 4896637.0, "dataInicio": "2024-10-28", "dataTerminoAdtv": "2027-10-28", "vigenciaMeses": "36", "status": "ok", "indiceSugerido": "", "reajuste": ""}, {"id": "143", "uen": "153", "diretoria": "RD", "cliente": "ENEL SP", "contrato": "4600004059 - UEN 153", "contratoCliente": "4600004059 / JA10163565", "linhaNegocios": "CCM", "mesReajuste": "Outubro", "clausula": "5.8", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 27000000.0, "dataInicio": "2024-10-30", "dataTerminoAdtv": "2026-04-30", "vigenciaMeses": "18", "status": "vence", "indiceSugerido": "", "reajuste": ""}, {"id": "145", "uen": "831", "diretoria": "GT", "cliente": "CGN", "contrato": "SOL 5398 - UEN 831", "contratoCliente": "SOL 5398 Guarda-Chuva", "linhaNegocios": "O&M", "mesReajuste": "Novembro", "clausula": "5", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 385932.59, "dataInicio": "2024-11-30", "dataTerminoAdtv": "2028-02-10", "vigenciaMeses": "38", "status": "ok", "indiceSugerido": "ipca_12m", "reajuste": "IPCA"}, {"id": "146", "uen": "832", "diretoria": "GT", "cliente": "ENGIE", "contrato": "RRBA.DPS.24.3156-832", "contratoCliente": "RRBA.DPS.24.3156", "linhaNegocios": "O&M", "mesReajuste": "Janeiro", "clausula": "CLÁUSULA DÉCIMA PRIMEIRA", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 1722230.21, "dataInicio": "2025-01-01", "dataTerminoAdtv": "2027-06-30", "vigenciaMeses": "29", "status": "ok", "indiceSugerido": "ipca_12m", "reajuste": "IPCA"}, {"id": "147", "uen": "678", "diretoria": "GT", "cliente": "ELETROBRAS", "contrato": "8000013932 - UEN 678", "contratoCliente": "8000013932", "linhaNegocios": "MANUTENÇÃO", "mesReajuste": "Dezembro", "clausula": "3.2", "obs": "Página 4", "tipoContratacao": "Contrato Contínuo", "valorTotal": 7107489.5, "dataInicio": "2024-12-26", "dataTerminoAdtv": "2026-12-26", "vigenciaMeses": "24", "status": "ok", "indiceSugerido": "ipca_12m", "reajuste": "IPCA"}, {"id": "148", "uen": "650", "diretoria": "GT", "cliente": "VERENE", "contrato": "00249/2024 - UEN 650", "contratoCliente": "00249/2024", "linhaNegocios": "MANUTENÇÃO", "mesReajuste": "Maio", "clausula": "4ª - Parágrafo Terceiro", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 2593080.0, "dataInicio": "2024-09-12", "dataTerminoAdtv": "2027-05-31", "vigenciaMeses": "32", "status": "ok", "indiceSugerido": "ipca_12m", "reajuste": "IPCA"}, {"id": "149", "uen": "674,675,676", "diretoria": "RD", "cliente": "ENEL RIO", "contrato": "JA10166038-AT NORTE", "contratoCliente": "JA10166038\nBR0078291047", "linhaNegocios": "ALTA TENSÃO", "mesReajuste": "Janeiro", "clausula": "5.7", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 113923303.13, "dataInicio": "2025-01-15", "dataTerminoAdtv": "2028-01-15", "vigenciaMeses": "36", "status": "ok", "indiceSugerido": "inpc_12m", "reajuste": "INPC"}, {"id": "150", "uen": "301", "diretoria": "RD", "cliente": "COPEL", "contrato": "4600029608 - UEN 301", "contratoCliente": "4600029608/2025", "linhaNegocios": "LEITURA", "mesReajuste": "Novembro", "clausula": "CLÁUSULA VIII. REAJUSTE DE PREÇOS", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 85132540.01, "dataInicio": "2025-03-23", "dataTerminoAdtv": "2028-03-23", "vigenciaMeses": "36", "status": "ok", "indiceSugerido": "ipca_12m", "reajuste": "IPCA"}, {"id": "151", "uen": "658", "diretoria": "GT", "cliente": "CPFL R", "contrato": "4600089888 - UEN 658", "contratoCliente": "4600089888", "linhaNegocios": "MANUTENÇÃO", "mesReajuste": "Março", "clausula": "6.1.2", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 12199083.7, "dataInicio": "2025-03-21", "dataTerminoAdtv": "2028-03-21", "vigenciaMeses": "36", "status": "ok", "indiceSugerido": "ipca_12m", "reajuste": "IPCA"}, {"id": "153", "uen": "264, 265, 266", "diretoria": "RD", "cliente": "ENEL RIO", "contrato": "JA10170087 - MARICA", "contratoCliente": "JA10170087", "linhaNegocios": "CCM", "mesReajuste": "Abril", "clausula": "5.9", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 80538834.78, "dataInicio": "2025-04-01", "dataTerminoAdtv": "2028-04-01", "vigenciaMeses": "36", "status": "ok", "indiceSugerido": "", "reajuste": "55% do IPCA-IBGE e 45% do INPC"}, {"id": "154", "uen": "253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263", "diretoria": "RD", "cliente": "ENEL RIO", "contrato": "JA10171327 - LAGOS", "contratoCliente": "JA10171327", "linhaNegocios": "CCM/STC", "mesReajuste": "Março", "clausula": "5.9", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 384254017.58, "dataInicio": "2025-04-17", "dataTerminoAdtv": "2028-04-17", "vigenciaMeses": "36", "status": "ok", "indiceSugerido": "ipca_12m", "reajuste": "IPCA"}, {"id": "155", "uen": "830", "diretoria": "GT", "cliente": "ENEVA", "contrato": "4600003470 - UEN 830", "contratoCliente": "4600003470", "linhaNegocios": "O&M", "mesReajuste": "Março", "clausula": "5.2", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 2403864.0, "dataInicio": "2025-03-13", "dataTerminoAdtv": "2028-03-13", "vigenciaMeses": "36", "status": "ok", "indiceSugerido": "", "reajuste": "73,75% INPC + 20,75% COMBUSTÍVEIS + 5,5% INFRA E MATERIAIS, VEÍCULOS, MANUTENÇÃO E PEÇAS"}, {"id": "156", "uen": "330", "diretoria": "RD", "cliente": "EDP SP", "contrato": "5600006070 - UEN 330", "contratoCliente": "5600006070", "linhaNegocios": "STC", "mesReajuste": "Janeiro", "clausula": "4.5", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 109817355.55, "dataInicio": "2025-07-01", "dataTerminoAdtv": "2030-07-01", "vigenciaMeses": "60", "status": "ok", "indiceSugerido": "", "reajuste": "73,75% INPC + 20,75% COMBUSTÍVEIS + 5,5% INFRA E MATERIAIS, VEÍCULOS, MANUTENÇÃO E PEÇAS"}, {"id": "157", "uen": "331", "diretoria": "RD", "cliente": "EDP SP", "contrato": "5600006069 - UEN 331", "contratoCliente": "5600006069", "linhaNegocios": "CCM", "mesReajuste": "Janeiro", "clausula": "4.5", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 146096584.43, "dataInicio": "2025-07-01", "dataTerminoAdtv": "2030-07-01", "vigenciaMeses": "60", "status": "ok", "indiceSugerido": "ipca_12m", "reajuste": "IPCA"}, {"id": "158", "uen": "833", "diretoria": "GT", "cliente": "PONTAL ENERGY", "contrato": "S/N UEN 833", "contratoCliente": "S/N UEN 833", "linhaNegocios": "O&M", "mesReajuste": "Abril", "clausula": "Anexo I - B", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 0, "dataInicio": "2025-04-28", "dataTerminoAdtv": "2028-04-28", "vigenciaMeses": "36", "status": "ok", "indiceSugerido": "", "reajuste": ""}, {"id": "160", "uen": "679", "diretoria": "GT", "cliente": "EDP T", "contrato": "5600006201 - UEN 679", "contratoCliente": "5600006201", "linhaNegocios": "O&M", "mesReajuste": "Maio", "clausula": "3.2", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 7875084.0, "dataInicio": "2025-05-16", "dataTerminoAdtv": "2026-05-16", "vigenciaMeses": "12", "status": "ok", "indiceSugerido": "ipca_12m", "reajuste": "IPCA"}, {"id": "161", "uen": "611", "diretoria": "GT", "cliente": "BRASKEM", "contrato": "4600031309 - UEN 611", "contratoCliente": "4600031309", "linhaNegocios": "INDÚSTRIA", "mesReajuste": "Abril", "clausula": "F.2.2)", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 8107674.66, "dataInicio": "2025-05-26", "dataTerminoAdtv": "2029-05-26", "vigenciaMeses": "48", "status": "ok", "indiceSugerido": "ipca_12m", "reajuste": "IPCA"}, {"id": "163", "uen": "834", "diretoria": "GT", "cliente": "SOLARIG", "contrato": "00027 - UEN 834", "contratoCliente": "00027", "linhaNegocios": "O&M", "mesReajuste": "Abril", "clausula": "Proposta Comercial - Item 9. PREÇOS - III", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 4275390.0, "dataInicio": "2025-05-05", "dataTerminoAdtv": "2030-05-05", "vigenciaMeses": "60", "status": "ok", "indiceSugerido": "ipca_12m", "reajuste": "IPCA"}, {"id": "164", "uen": "771", "diretoria": "GT", "cliente": "EDP T", "contrato": "5600006378 - UEN 771", "contratoCliente": "5600006378", "linhaNegocios": "CONSTRUÇÃO", "mesReajuste": "Agosto", "clausula": "3.2", "obs": "IPCA", "tipoContratacao": "Execução de Projeto", "valorTotal": 30900074.59, "dataInicio": "2025-08-08", "dataTerminoAdtv": "2026-08-08", "vigenciaMeses": "12", "status": "ok", "indiceSugerido": "", "reajuste": ""}, {"id": "165", "uen": "829", "diretoria": "GT", "cliente": "RENOVA", "contrato": "OMEOL202500018 - 829", "contratoCliente": "OMEOL202500018", "linhaNegocios": "O&M", "mesReajuste": "", "clausula": "", "obs": "", "tipoContratacao": "Execução de Projeto", "valorTotal": 479520.0, "dataInicio": "2025-08-15", "dataTerminoAdtv": "2026-02-28", "vigenciaMeses": "6", "status": "atrasado", "indiceSugerido": "", "reajuste": ""}, {"id": "166", "uen": "811", "diretoria": "GT", "cliente": "SAMARCO", "contrato": "4600004329 - UEN 811", "contratoCliente": "4600004329", "linhaNegocios": "O&M", "mesReajuste": "", "clausula": "", "obs": "", "tipoContratacao": "Execução de Projeto", "valorTotal": 495611.88, "dataInicio": "2025-07-14", "dataTerminoAdtv": "2026-01-14", "vigenciaMeses": "6", "status": "atrasado", "indiceSugerido": "", "reajuste": "fórmula paramétrica de 55% (cinquenta e cinco por cento) da variação do IPCA-IBGE e 45%\n(quarenta e cinco por cento) da variação do INPC"}, {"id": "167", "uen": "270, 272", "diretoria": "RD", "cliente": "ENEL RIO", "contrato": "JA10178257 - SOT NOR", "contratoCliente": "JA10178257", "linhaNegocios": "CCM", "mesReajuste": "Julho", "clausula": "5.9", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 120522955.72, "dataInicio": "2025-08-27", "dataTerminoAdtv": "2028-08-27", "vigenciaMeses": "36", "status": "ok", "indiceSugerido": "", "reajuste": "fórmula paramétrica de 55% (cinquenta e cinco por cento) da variação do IPCA-IBGE e 45%\n(quarenta e cinco por cento) da variação do INPC"}, {"id": "168", "uen": "268, 269, 271", "diretoria": "RD", "cliente": "ENEL RIO", "contrato": "JA10178258 - SOC NOR", "contratoCliente": "JA10178258", "linhaNegocios": "STC", "mesReajuste": "Julho", "clausula": "5.9", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 81862012.42, "dataInicio": "2025-08-27", "dataTerminoAdtv": "2028-08-27", "vigenciaMeses": "36", "status": "ok", "indiceSugerido": "", "reajuste": "fórmula paramétrica de 55% (cinquenta e cinco por cento) da variação do IPCA-IBGE e 45%\n(quarenta e cinco por cento) da variação do INPC"}, {"id": "169", "uen": "INATIVA", "diretoria": "RD", "cliente": "ENEL RIO", "contrato": "JA10178259 - MERC NO", "contratoCliente": "JA10178259", "linhaNegocios": "STC", "mesReajuste": "Julho", "clausula": "5.9", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 42804755.95, "dataInicio": "2025-08-27", "dataTerminoAdtv": "2028-08-27", "vigenciaMeses": "36", "status": "ok", "indiceSugerido": "", "reajuste": ""}, {"id": "171", "uen": "772", "diretoria": "GT", "cliente": "ARCELORMITTAL", "contrato": "5800042154 - UEN 772", "contratoCliente": "5800042154", "linhaNegocios": "CONSTRUÇÃO", "mesReajuste": "Setembro", "clausula": "", "obs": "Não Tem Cláusula de Reajuste", "tipoContratacao": "Execução de Projeto", "valorTotal": 4196035.0, "dataInicio": "2025-09-15", "dataTerminoAdtv": "2027-03-15", "vigenciaMeses": "18", "status": "ok", "indiceSugerido": "", "reajuste": "fórmula paramétrica de 55% (cinquenta e cinco por cento) da variação do IPCA-IBGE e 45%\n(quarenta e cinco por cento) da variação do INPC"}, {"id": "172", "uen": "273", "diretoria": "RD", "cliente": "ENEL RIO", "contrato": "JA10179594 - SOC RES", "contratoCliente": "JA10179594", "linhaNegocios": "STC", "mesReajuste": "Outubro", "clausula": "5.9", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 34092225.88, "dataInicio": "2025-10-01", "dataTerminoAdtv": "2028-10-01", "vigenciaMeses": "36", "status": "ok", "indiceSugerido": "", "reajuste": "fórmula paramétrica de 55% (cinquenta e cinco por cento) da variação do IPCA-IBGE e 45%\n(quarenta e cinco por cento) da variação do INPC"}, {"id": "173", "uen": "274, 275", "diretoria": "RD", "cliente": "ENEL RIO", "contrato": "JA10179596 - SOT RES", "contratoCliente": "JA10179596", "linhaNegocios": "CCM", "mesReajuste": "Outubro", "clausula": "5.9", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 69309328.0, "dataInicio": "2025-10-01", "dataTerminoAdtv": "2028-10-01", "vigenciaMeses": "36", "status": "ok", "indiceSugerido": "", "reajuste": "fórmula paramétrica de 55% (cinquenta e cinco por cento) da variação do IPCA-IBGE e 45%\n(quarenta e cinco por cento) da variação do INPC"}, {"id": "175", "uen": "773", "diretoria": "GT", "cliente": "EDP ES", "contrato": "5600006475 - UEN 773", "contratoCliente": "5600006475", "linhaNegocios": "CONSTRUÇÃO", "mesReajuste": "", "clausula": "", "obs": "", "tipoContratacao": "Execução de Projeto", "valorTotal": 4295605.65, "dataInicio": "2025-09-30", "dataTerminoAdtv": "2026-05-30", "vigenciaMeses": "8", "status": "ok", "indiceSugerido": "incc", "reajuste": "INCC"}, {"id": "176", "uen": "902", "diretoria": "GT", "cliente": "ANGLO AMERICAN", "contrato": "4600045482 - UEN 902", "contratoCliente": "4600045482", "linhaNegocios": "INDÚSTRIA", "mesReajuste": "Setembro", "clausula": "6.7", "obs": "", "tipoContratacao": "Execução de Projeto", "valorTotal": 1780074.0, "dataInicio": "2025-10-08", "dataTerminoAdtv": "2026-10-08", "vigenciaMeses": "12", "status": "ok", "indiceSugerido": "ipca_12m", "reajuste": "IPCA"}, {"id": "177", "uen": "681", "diretoria": "GT", "cliente": "VERENE", "contrato": "197.2025 - UEN 681", "contratoCliente": "197.2025", "linhaNegocios": "MANUTENÇÃO", "mesReajuste": "Outubro", "clausula": "8.9", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 13450000.0, "dataInicio": "2025-10-30", "dataTerminoAdtv": "2029-12-30", "vigenciaMeses": "50", "status": "ok", "indiceSugerido": "", "reajuste": "PR=P0*[0,45*(IPCA¹ / IPCAº) + 0,30*(IGP-DI¹ / IGP-DIº) + 0,25 *(INCC¹ / INCCº)]\nPR - Preço Reajustado\nP0 - Preço Atual\n0,45 - IPCA (1004963) - IBGE\n0,30 - IGP-DI (161384)\n0,25 - INCC-DI All Itens Col. 47A Stepwise (1464783)\nÍndice¹ - Índice FGV do mês anterior de aniversário da assinatura do contrato\nÍndiceº - Índice FGV do mês anterior à data de assinatura do contrato"}, {"id": "178", "uen": "906", "diretoria": "GT", "cliente": "VALE", "contrato": "5500125727 - UEN 906", "contratoCliente": "5500125727", "linhaNegocios": "INDÚSTRIA", "mesReajuste": "Outubro", "clausula": "3.4", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 100773404.54, "dataInicio": "2025-10-31", "dataTerminoAdtv": "2028-12-23", "vigenciaMeses": "37", "status": "ok", "indiceSugerido": "ipca_12m", "reajuste": "IPCA"}, {"id": "179", "uen": "267", "diretoria": "RD", "cliente": "LIGHT", "contrato": "S/N - UEN 267", "contratoCliente": "S/N", "linhaNegocios": "CCM", "mesReajuste": "Agosto", "clausula": "5.6", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 32369952.0, "dataInicio": "2025-11-14", "dataTerminoAdtv": "2028-02-14", "vigenciaMeses": "27", "status": "ok", "indiceSugerido": "", "reajuste": ""}, {"id": "180", "uen": "774", "diretoria": "GT", "cliente": "IMETAME", "contrato": "000092 - UEN 774", "contratoCliente": "000092", "linhaNegocios": "CONSTRUÇÃO", "mesReajuste": "", "clausula": "", "obs": "", "tipoContratacao": "Execução de Projeto", "valorTotal": 2200000.0, "dataInicio": "2025-11-18", "dataTerminoAdtv": "2026-08-18", "vigenciaMeses": "9", "status": "ok", "indiceSugerido": "ipca_12m", "reajuste": "IPCA"}, {"id": "181", "uen": "775", "diretoria": "GT", "cliente": "CPFL T", "contrato": "S/N - UEN 775", "contratoCliente": "S/N", "linhaNegocios": "CONSTRUÇÃO", "mesReajuste": "Outubro", "clausula": "17.1", "obs": "", "tipoContratacao": "Execução de Projeto", "valorTotal": 152758928.76, "dataInicio": "2025-10-31", "dataTerminoAdtv": "2029-10-28", "vigenciaMeses": "47", "status": "ok", "indiceSugerido": "ipca_12m", "reajuste": "IPCA"}, {"id": "182", "uen": "682", "diretoria": "GT", "cliente": "NORTE ENERGIA", "contrato": "DOM-S-008/2025 - 682", "contratoCliente": "DOM-S-008/2025", "linhaNegocios": "MANUTENÇÃO", "mesReajuste": "Janeiro", "clausula": "6.9", "obs": "", "tipoContratacao": "Contrato Contínuo", "valorTotal": 11625060.0, "dataInicio": "2026-01-19", "dataTerminoAdtv": "2031-03-19", "vigenciaMeses": "62", "status": "ok", "indiceSugerido": "", "reajuste": "45% do IPCA + 30% do IGPD-I + 25% do INCC"}, {"id": "183", "uen": "907", "diretoria": "GT", "cliente": "CSN", "contrato": "CW2374322 - UEN 907", "contratoCliente": "CW2374322", "linhaNegocios": "INDÚSTRIA", "mesReajuste": "Janeiro", "clausula": "11", "obs": "PAGINA 4", "tipoContratacao": "Execução de Projeto", "valorTotal": 16580904.52, "dataInicio": "2026-01-01", "dataTerminoAdtv": "2028-12-31", "vigenciaMeses": "35", "status": "ok", "indiceSugerido": "", "reajuste": "Fórmula paramétrica\nPr = Preço reajustado\nPv = Preço vigente\nINCC_MO = Índice Nacional de Custo da Construção, correspondente à mão-de-obra, publicado\npela revista Conjuntura Econômica da Fundação Getúlio Vargas, disponível no momento do cálculo\ndo reajuste.\nINCC_MOo = Índice Nacional de Custo da Construção, correspondente à mão-de-obra, publicado\npela revista Conjuntura Econômica da Fundação Getúlio Vargas, referente ao mês de assinatura do\ncontrato ou do último reajuste.\nINPC = Índice Nacional de Preços ao Consumidor, apurado pelo Instituto Brasileiro de Geografia e\nEstatística, disponível no momento do cálculo do reajuste.\nINPCo = Índice Nacional de Preços ao Consumidor, apurado pelo Instituto Brasileiro de Geografia\ne Estatística, referente ao mês de assinatura do contrato ou do último reajuste."}, {"id": "184", "uen": "302", "diretoria": "RD", "cliente": "COPEL", "contrato": "847 - UEN 302", "contratoCliente": "847 |  4600031379", "linhaNegocios": "STC", "mesReajuste": "Fevereiro", "clausula": "VIII", "obs": "PAGINA 8", "tipoContratacao": "Contrato Contínuo", "valorTotal": 15777095.04, "dataInicio": "2026-02-03", "dataTerminoAdtv": "2028-02-03", "vigenciaMeses": "24", "status": "ok", "indiceSugerido": "", "reajuste": "CCM= 0,60 INCC (MO)+0,15 MEC +0,03 CL+ 0,22 IPCA"}, {"id": "185", "uen": "216, 217", "diretoria": "RD", "cliente": "CEMIG", "contrato": "4680008095 - 216-217", "contratoCliente": "4680008095", "linhaNegocios": "CCM", "mesReajuste": "Fevereiro", "clausula": "6.1", "obs": "PÁGINA 13", "tipoContratacao": "Contrato Contínuo", "valorTotal": 284910597.0, "dataInicio": "2026-02-26", "dataTerminoAdtv": "2031-02-26", "vigenciaMeses": "60", "status": "ok", "indiceSugerido": "", "reajuste": ""}];
+
+// ============================================================
+// CACHE DOS ÍNDICES (preenchido pelas APIs)
+// ============================================================
+const IDX = {
+  ipca_mes: null, ipca_12m: null, ipca_periodo: null,
+  inpc_mes: null, inpc_12m: null,
+  igpm_mes: null, igpm_12m: null,
+  selic: null,
+  historico: []  // [{mes, ipca, inpc, igpm, selic}]
+};
+
+// ============================================================
+// TABS
+// ============================================================
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ============================================================
+// PROXY HELPER (contorna CORS das APIs governamentais)
+// ============================================================
+// ============================================================
+// API DO BANCO CENTRAL — JSONP (contorna CORS sem proxy externo)
+// IPCA=433 | INPC=188 | IGP-M=189 | Selic meta=432
+// ============================================================
+function fetchBCB(serie, n = 14) {
+  return new Promise((resolve) => {
+    const cbName = `_bcb_${serie}_${Date.now()}`;
+    const script = document.createElement('script');
+    const timer = setTimeout(() => {
+      cleanup();
+      console.warn(`[BCB] Timeout na série ${serie}`);
+      resolve(null);
+    }, 12000);
+
+    function cleanup() {
+      clearTimeout(timer);
+      delete window[cbName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+    }
+
+    window[cbName] = (data) => {
+      cleanup();
+      resolve(data);
+    };
+
+    // BCB SGS suporta JSONP com parâmetro callback
+    script.src = `https://api.bcb.gov.br/dados/serie/bcdata.sgs.${serie}/dados/ultimos/${n}?formato=json&callback=${cbName}`;
+    script.onerror = () => {
+      cleanup();
+      console.warn(`[BCB] Erro ao carregar script da série ${serie}`);
+      resolve(null);
+    };
+    document.head.appendChild(script);
+  });
+}
+
+// ============================================================
+// CALCULAR ACUMULADO 12M a partir de array de variações mensais
+// ============================================================
+function acum12m(arr) {
+  if (!arr || arr.length < 12) return null;
+  const last12 = arr.slice(-12);
+  return last12.reduce((acc, v) => acc * (1 + v / 100), 1) * 100 - 100;
+}
+
+// Calcular acumulado 12m de um índice até um determinado mês/ano
+// mesLabel: "Jan/2026", serie: 'ipca' | 'inpc' | 'igpm'
+function acum12mParaMes(serie, mesLabel) {
+  const rawMap = { ipca: IDX._ipca_raw, inpc: IDX._inpc_raw, igpm: IDX._igpm_raw };
+  const idxMap = { ipca: IDX._ipca_byMes, inpc: IDX._inpc_byMes, igpm: IDX._igpm_byMes };
+  const raw = rawMap[serie];
+  const byMes = idxMap[serie];
+  if (!raw || !byMes) return null;
+  const idx = byMes[mesLabel];
+  if (idx === undefined || idx < 11) return null; // precisa de 12 meses anteriores
+  const slice = raw.slice(idx - 11, idx + 1).map(x => parseFloat(x.valor));
+  return slice.reduce((acc, v) => acc * (1 + v / 100), 1) * 100 - 100;
+}
+
+// Converter "Janeiro/2026" → "Jan/2026" para lookup
+function mesSelectToLabel(mesNome, ano) {
+  const map = { Janeiro:'Jan', Fevereiro:'Fev', Março:'Mar', Abril:'Abr', Maio:'Mai',
+                Junho:'Jun', Julho:'Jul', Agosto:'Ago', Setembro:'Set',
+                Outubro:'Out', Novembro:'Nov', Dezembro:'Dez' };
+  return map[mesNome] ? `${map[mesNome]}/${ano}` : null;
+}
+
+// Formatar mês do BCB: "01/02/2025" → "Fev/2025"
+const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+function fmtMesBCB(s) {
+  if (!s) return '—';
+  const p = s.split('/');
+  if (p.length === 3) return `${MESES[parseInt(p[1]) - 1]}/${p[2]}`;
+  return s;
+}
+
+
+// ============================================================
+// DADOS ESTÁTICOS — fallback quando BCB/API estiver offline
+// Fonte: IBGE / FGV / BCB  |  Atualizado até Jan/2026
+// ============================================================
+const FALLBACK_DATA = {
+  ipca: [
+    {data:'01/02/2024',valor:'0.83'},{data:'01/03/2024',valor:'0.16'},{data:'01/04/2024',valor:'0.38'},
+    {data:'01/05/2024',valor:'0.46'},{data:'01/06/2024',valor:'0.20'},{data:'01/07/2024',valor:'0.38'},
+    {data:'01/08/2024',valor:'-0.02'},{data:'01/09/2024',valor:'0.44'},{data:'01/10/2024',valor:'0.56'},
+    {data:'01/11/2024',valor:'0.39'},{data:'01/12/2024',valor:'0.52'},{data:'01/01/2025',valor:'0.16'},
+    {data:'01/02/2025',valor:'1.31'},{data:'01/03/2025',valor:'0.56'},{data:'01/04/2025',valor:'0.43'},
+    {data:'01/05/2025',valor:'0.26'},{data:'01/06/2025',valor:'0.24'},{data:'01/07/2025',valor:'0.26'},
+    {data:'01/08/2025',valor:'-0.11'},{data:'01/09/2025',valor:'0.48'},{data:'01/10/2025',valor:'0.09'},
+    {data:'01/11/2025',valor:'0.18'},{data:'01/12/2025',valor:'0.33'},{data:'01/01/2026',valor:'0.33'}
+  ],
+  inpc: [
+    {data:'01/02/2024',valor:'0.78'},{data:'01/03/2024',valor:'0.20'},{data:'01/04/2024',valor:'0.42'},
+    {data:'01/05/2024',valor:'0.50'},{data:'01/06/2024',valor:'0.18'},{data:'01/07/2024',valor:'0.38'},
+    {data:'01/08/2024',valor:'-0.10'},{data:'01/09/2024',valor:'0.48'},{data:'01/10/2024',valor:'0.56'},
+    {data:'01/11/2024',valor:'0.41'},{data:'01/12/2024',valor:'0.48'},{data:'01/01/2025',valor:'0.00'},
+    {data:'01/02/2025',valor:'1.48'},{data:'01/03/2025',valor:'0.51'},{data:'01/04/2025',valor:'0.48'},
+    {data:'01/05/2025',valor:'0.35'},{data:'01/06/2025',valor:'0.23'},{data:'01/07/2025',valor:'0.21'},
+    {data:'01/08/2025',valor:'-0.21'},{data:'01/09/2025',valor:'0.52'},{data:'01/10/2025',valor:'0.03'},
+    {data:'01/11/2025',valor:'0.03'},{data:'01/12/2025',valor:'0.21'},{data:'01/01/2026',valor:'0.39'}
+  ],
+  igpm: [
+    {data:'01/02/2024',valor:'0.97'},{data:'01/03/2024',valor:'0.47'},{data:'01/04/2024',valor:'0.87'},
+    {data:'01/05/2024',valor:'0.89'},{data:'01/06/2024',valor:'1.10'},{data:'01/07/2024',valor:'0.61'},
+    {data:'01/08/2024',valor:'0.29'},{data:'01/09/2024',valor:'0.62'},{data:'01/10/2024',valor:'1.52'},
+    {data:'01/11/2024',valor:'1.35'},{data:'01/12/2024',valor:'0.94'},{data:'01/01/2025',valor:'0.94'},
+    {data:'01/02/2025',valor:'1.06'},{data:'01/03/2025',valor:'-0.34'},{data:'01/04/2025',valor:'0.24'},
+    {data:'01/05/2025',valor:'-0.49'},{data:'01/06/2025',valor:'-1.67'},{data:'01/07/2025',valor:'-0.77'},
+    {data:'01/08/2025',valor:'0.36'},{data:'01/09/2025',valor:'0.42'},{data:'01/10/2025',valor:'-0.36'},
+    {data:'01/11/2025',valor:'0.27'},{data:'01/12/2025',valor:'-0.01'},{data:'01/01/2026',valor:'0.41'}
+  ],
+  selic: [{data:'01/01/2026',valor:'14.75'}]
+};
+
+function usarFallback() {
+  console.warn('[BCB] Usando dados estáticos (fallback)');
+  const processar = (raw) => {
+    const vals = raw.map(x => parseFloat(x.valor));
+    return { raw, vals, ultimo: vals[vals.length-1], periodo: fmtMesBCB(raw[raw.length-1].data) };
+  };
+  const ipca  = processar(FALLBACK_DATA.ipca);
+  const inpc  = processar(FALLBACK_DATA.inpc);
+  const igpm  = processar(FALLBACK_DATA.igpm);
+
+  IDX.ipca_mes = ipca.ultimo; IDX.ipca_12m = acum12m(ipca.vals);
+  IDX.ipca_periodo = ipca.periodo; IDX._ipca_raw = FALLBACK_DATA.ipca;
+
+  IDX.inpc_mes = inpc.ultimo; IDX.inpc_12m = acum12m(inpc.vals);
+  IDX._inpc_raw = FALLBACK_DATA.inpc;
+
+  IDX.igpm_mes = igpm.ultimo; IDX.igpm_12m = acum12m(igpm.vals);
+  IDX._igpm_raw = FALLBACK_DATA.igpm;
+
+  IDX.selic = 14.75; IDX.selic_periodo = 'Jan/2026';
+
+  // Estimados
+  IDX.incc  = 4.97;
+  IDX.igpdi = 0.82;
+  IDX.sinapi = 3.87;
+  IDX._fromFallback = true;
+
+  // Montar histórico combinado (últimos 12 meses)
+  IDX.historico = FALLBACK_DATA.ipca.slice(-14).map((item, i, arr) => {
+    const mes = fmtMesBCB(item.data);
+    const ipca_v = parseFloat(item.valor);
+    const globalI = FALLBACK_DATA.ipca.length - 14 + i;
+    const slice = FALLBACK_DATA.ipca.slice(0, globalI + 1).map(x => parseFloat(x.valor));
+    const ac12 = acum12m(slice);
+    const inpc_v = FALLBACK_DATA.inpc[globalI] ? parseFloat(FALLBACK_DATA.inpc[globalI].valor) : null;
+    const igpm_v = FALLBACK_DATA.igpm[globalI] ? parseFloat(FALLBACK_DATA.igpm[globalI].valor) : null;
+    return { mes, ipca: ipca_v, acIPCA: ac12, inpc: inpc_v, igpm: igpm_v };
+  }).reverse();
+
+  // Indexar por mês para acum12mParaMes
+  IDX._ipca_byMes = {}; FALLBACK_DATA.ipca.forEach((x,i) => { IDX._ipca_byMes[fmtMesBCB(x.data)] = i; });
+  IDX._inpc_byMes = {}; FALLBACK_DATA.inpc.forEach((x,i) => { IDX._inpc_byMes[fmtMesBCB(x.data)] = i; });
+  IDX._igpm_byMes = {}; FALLBACK_DATA.igpm.forEach((x,i) => { IDX._igpm_byMes[fmtMesBCB(x.data)] = i; });
+}
+// ============================================================
+// CARREGAR TODOS OS ÍNDICES
+// ============================================================
+async function carregarTodosIndices(forcar = false) {
+  setBadge('badge-bcb', 'loading');
+  setBadge('badge-ibge', 'loading');
+
+  // ---- IPCA (BCB série 433) ----
+  const ipca = await fetchBCB(433, 36);
+  if (ipca && ipca.length) {
+    const vals = ipca.map(x => parseFloat(x.valor));
+    IDX.ipca_mes = vals[vals.length - 1];
+    IDX.ipca_12m = acum12m(vals);
+    IDX.ipca_periodo = fmtMesBCB(ipca[ipca.length - 1].data);
+    IDX._ipca_raw = ipca;
+  }
+
+  // ---- INPC (BCB série 188) ----
+  const inpc = await fetchBCB(188, 36);
+  if (inpc && inpc.length) {
+    const vals = inpc.map(x => parseFloat(x.valor));
+    IDX.inpc_mes = vals[vals.length - 1];
+    IDX.inpc_12m = acum12m(vals);
+    IDX._inpc_raw = inpc;
+  }
+
+  // ---- IGP-M (BCB série 189) ----
+  const igpm = await fetchBCB(189, 36);
+  if (igpm && igpm.length) {
+    const vals = igpm.map(x => parseFloat(x.valor));
+    IDX.igpm_mes = vals[vals.length - 1];
+    IDX.igpm_12m = acum12m(vals);
+    IDX._igpm_raw = igpm;
+  }
+
+  // ---- Selic meta (BCB série 432) ----
+  const selic = await fetchBCB(432, 3);
+  if (selic && selic.length) {
+    IDX.selic = parseFloat(selic[selic.length - 1].valor);
+    IDX.selic_periodo = fmtMesBCB(selic[selic.length - 1].data);
+  }
+
+  // ---- Montar histórico combinado + índices por mês para lookup ----
+  if (IDX._ipca_raw) {
+    // Mapas: "Jan/2025" → array index para busca rápida
+    IDX._ipca_byMes = {};
+    IDX._inpc_byMes = {};
+    IDX._igpm_byMes = {};
+    IDX._ipca_raw.forEach((item, i) => {
+      IDX._ipca_byMes[fmtMesBCB(item.data)] = i;
+    });
+    if (IDX._inpc_raw) IDX._inpc_raw.forEach((item, i) => { IDX._inpc_byMes[fmtMesBCB(item.data)] = i; });
+    if (IDX._igpm_raw) IDX._igpm_raw.forEach((item, i) => { IDX._igpm_byMes[fmtMesBCB(item.data)] = i; });
+
+    IDX.historico = IDX._ipca_raw.map((item, i) => {
+      const mes = fmtMesBCB(item.data);
+      const ipca_v = parseFloat(item.valor);
+      const slice = IDX._ipca_raw.slice(0, i + 1).map(x => parseFloat(x.valor));
+      const ac12 = acum12m(slice);
+      const inpc_v = IDX._inpc_raw && IDX._inpc_raw[i] ? parseFloat(IDX._inpc_raw[i].valor) : null;
+      const igpm_v = IDX._igpm_raw && IDX._igpm_raw[i] ? parseFloat(IDX._igpm_raw[i].valor) : null;
+      return { mes, ipca: ipca_v, acIPCA: ac12, inpc: inpc_v, igpm: igpm_v };
+    }).reverse();
+  }
+
+  // Se API falhou, usar fallback estático
+  if (IDX.ipca_mes === null) usarFallback();
+
+  const ok = IDX.ipca_mes !== null;
+  setBadge('badge-bcb', ok ? (IDX._fromFallback ? 'warn' : 'ok') : 'err');
+  setBadge('badge-ibge', ok ? (IDX._fromFallback ? 'warn' : 'ok') : 'err');
+  if (IDX._fromFallback) {
+    document.querySelectorAll('.last-update').forEach(el => el.textContent = 'Dados estáticos (Jan/2026) · Sem conexão com BCB');
+  }
+
+  const now = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  document.querySelectorAll('.last-update').forEach(el => el.textContent = `Atualizado às ${now}`);
+
+  renderIndices();
+  renderHistorico();
+  atualizarDashboard();
+  atualizarSelectCalc();
+  // Re-preenche campo % se índice já estava selecionado
+  if (document.getElementById('calc-indice').value) onIndiceChange();
+}
+
+function setBadge(id, state) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const dot = el.querySelector('.dot');
+  if (state === 'loading') { if (dot) dot.style.background = 'var(--warning)'; el.classList.remove('live'); }
+  else if (state === 'ok') { if (dot) dot.style.background = 'var(--accent)'; el.classList.add('live'); }
+  else { if (dot) dot.style.background = 'var(--danger)'; el.classList.remove('live'); }
+}
+
+// ============================================================
+// RENDERIZAR CARDS DE ÍNDICES
+// ============================================================
+const INDICE_CONFIG = [
+  { key: 'ipca',  nome: 'IPCA',   full: 'Índice Nacional de Preços ao Consumidor Amplo', src: 'bcb', srcLabel: 'BCB·433', mes: 'ipca_mes',  acum: 'ipca_12m' },
+  { key: 'inpc',  nome: 'INPC',   full: 'Índice Nacional de Preços ao Consumidor',        src: 'bcb', srcLabel: 'BCB·188', mes: 'inpc_mes',  acum: 'inpc_12m' },
+  { key: 'igpm',  nome: 'IGP-M',  full: 'Índice Geral de Preços – Mercado (FGV)',          src: 'bcb', srcLabel: 'BCB·189', mes: 'igpm_mes',  acum: 'igpm_12m' },
+  { key: 'selic', nome: 'Selic',  full: 'Taxa Selic – Meta do Copom (a.a.)',               src: 'bcb', srcLabel: 'BCB·432', mes: 'selic',     acum: null },
+  { key: 'incc',  nome: 'INCC',   full: 'Índice Nacional de Custo da Construção',          src: 'est', srcLabel: 'FGV·est', mes_v: 0.55, acum_v: 4.21 },
+  { key: 'igpdi', nome: 'IGP-DI', full: 'Índice Geral de Preços – Disponibilidade Interna',src: 'est', srcLabel: 'FGV·est', mes_v: 0.57, acum_v: 5.92 },
+  { key: 'ipcae', nome: 'IPCA-E', full: 'IPCA Especial (prévia quinzenal)',                 src: 'est', srcLabel: 'IBGE·est',mes_v: 0.78, acum_v: 4.70 },
+  { key: 'sinapi',nome: 'SINAPI', full: 'Sist. Nac. de Pesq. de Custos da Construção',    src: 'est', srcLabel: 'CEF·est', mes_v: 0.38, acum_v: 3.87 },
+];
+
+function fmtPct(v) { if (v === null || v === undefined || isNaN(v)) return '—'; return (v >= 0 ? '+' : '') + v.toFixed(2) + '%'; }
+
+function renderIndices() {
+  const periodo = IDX.ipca_periodo || 'Fev/2025';
+  const periodoEl = document.getElementById('periodo-label');
+  if (periodoEl) periodoEl.textContent = periodo;
+
+  const grid = document.getElementById('mes-cards-grid');
+  grid.innerHTML = INDICE_CONFIG.map(cfg => {
+    const mesVal = cfg.mes_v !== undefined ? cfg.mes_v : IDX[cfg.mes];
+    const acumVal = cfg.acum_v !== undefined ? cfg.acum_v : (cfg.acum ? IDX[cfg.acum] : null);
+    const isLive = cfg.src !== 'est' && mesVal !== null;
+    const loading = acumVal === null && mesVal === null;
+    // Valor grande = acumulado 12m; se não tiver (ex: Selic), usa o mensal
+    const bigVal = acumVal !== null ? acumVal : mesVal;
+    const bigClass = loading ? 'loading' : (bigVal >= 0 ? 'pos' : 'neg');
+    const bigHtml = loading ? `<span class="loading-ring"></span>` : fmtPct(bigVal);
+    const bigLabel = acumVal !== null ? 'acum. 12m' : periodo;
+    return `<div class="mes-card ${isLive ? 'live' : ''}">
+      <div class="mc-header">
+        <div class="mc-nome">${cfg.nome}</div>
+        <span class="mc-badge ${isLive ? 'live' : 'est'}">${isLive ? '● ao vivo' : 'estimado'}</span>
+      </div>
+      <div class="mc-full">${cfg.full}</div>
+      <div class="mc-valor ${bigClass}">${bigHtml}</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:var(--muted);margin-bottom:10px;letter-spacing:0.06em;text-transform:uppercase;">${bigLabel}</div>
+      <div class="mc-acum">
+        ${mesVal !== null && acumVal !== null
+          ? `<span class="mc-acum-label">mensal</span><span class="mc-acum-val" style="margin-left:4px">${fmtPct(mesVal)}</span><span class="mc-src src-${cfg.src}" style="margin-left:auto">${cfg.srcLabel}</span>`
+          : `<span class="mc-src src-${cfg.src}">${cfg.srcLabel}</span>`}
+      </div>
+    </div>`;
+  }).join('');
+
+  const alertEl = document.getElementById('alert-indices-status');
+  const hasLive = IDX.ipca_mes !== null;
+  alertEl.innerHTML = hasLive
+    ? `<div class="alert alert-success" style="margin-bottom:20px;">✅ IPCA, INPC, IGP-M e Selic carregados ao vivo via <strong>API do Banco Central do Brasil (SGS)</strong>. INCC, IGP-DI, IPCA-E e SINAPI usam valores estimados (FGV/CEF não têm API pública com CORS).</div>`
+    : `<div class="alert alert-warn" style="margin-bottom:20px;">⚠️ Não foi possível conectar às APIs. Verifique sua conexão. <button class="btn btn-outline btn-sm" onclick="carregarTodosIndices(true)" style="margin-left:10px;">Tentar novamente</button></div>`;
+}
+
+// ============================================================
+// HISTÓRICO
+// ============================================================
+function renderHistorico() {
+  const tbody = document.getElementById('tabela-historico');
+  const statusEl = document.getElementById('hist-status');
+  if (!IDX.historico.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="color:var(--muted);text-align:center;padding:20px;">Sem dados. Verifique sua conexão.</td></tr>';
+    statusEl.className = 'data-status err'; statusEl.textContent = 'erro';
+    return;
+  }
+  statusEl.className = 'data-status ok'; statusEl.textContent = 'BCB ao vivo';
+  tbody.innerHTML = IDX.historico.slice(0, 14).map(h => {
+    const f = v => v !== null && !isNaN(v) ? `<span class="${v >= 0 ? 'val-pos' : 'val-neg'}">${fmtPct(v)}</span>` : '—';
+    return `<tr><td style="color:var(--text)">${h.mes}</td><td>${f(h.ipca)}</td><td>${h.acIPCA !== null ? `<span class="val-pos">${fmtPct(h.acIPCA)}</span>` : '—'}</td><td>${f(h.inpc)}</td><td>${f(h.igpm)}</td><td>${IDX.selic !== null ? `<span class="val-pos">${IDX.selic.toFixed(2)}%</span>` : '—'}</td></tr>`;
+  }).join('');
+}
+
+// ============================================================
+// DASHBOARD CARDS DE ÍNDICE
+// ============================================================
+function atualizarDashboard() {
+
+  // Chart de barras no dashboard (acumulado 12m)
+  const dados = [
+    { label: 'IPCA', val: IDX.ipca_12m, src: 'BCB·433' },
+    { label: 'INPC', val: IDX.inpc_12m, src: 'BCB·188' },
+    { label: 'IGP-M', val: IDX.igpm_12m, src: 'BCB·189' },
+    { label: 'INCC', val: 4.21, src: 'FGV·est' },
+    { label: 'SINAPI', val: 3.87, src: 'CEF·est' },
+    { label: 'Selic', val: IDX.selic, src: 'BCB·432' },
+  ];
+  const maxV = Math.max(...dados.map(d => d.val || 0), 1);
+  document.getElementById('chart-indices').innerHTML = dados.map(d =>
+    `<div class="chart-row">
+      <div class="chart-label">${d.label}</div>
+      <div class="chart-bar-outer"><div class="chart-bar-inner" style="width:${d.val ? Math.min((d.val / maxV) * 100, 100) : 0}%"></div></div>
+      <div class="chart-val">${d.val !== null && d.val !== undefined ? fmtPct(d.val) : '—'}</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:0.55rem;color:var(--muted);width:60px">${d.src}</div>
+    </div>`
+  ).join('');
+}
+
+// ============================================================
+// CALCULADORA — atualizar opções com valores reais
+// ============================================================
+function atualizarSelectCalc() {
+  const upd = (id, val, label) => {
+    const el = document.getElementById(id);
+    if (el && val !== null) el.textContent = `${label}: ${fmtPct(val)} (BCB ao vivo)`;
+  };
+  upd('opt-ipca-mes', IDX.ipca_mes, 'IPCA – último mês');
+  upd('opt-ipca-12m', IDX.ipca_12m, 'IPCA – acum. 12m');
+  upd('opt-igpm-mes', IDX.igpm_mes, 'IGP-M – último mês');
+  upd('opt-igpm-12m', IDX.igpm_12m, 'IGP-M – acum. 12m');
+  upd('opt-inpc-mes', IDX.inpc_mes, 'INPC – último mês');
+  upd('opt-inpc-12m', IDX.inpc_12m, 'INPC – acum. 12m');
+  upd('opt-selic', IDX.selic, 'Selic – meta a.a.');
+
+  const alertEl = document.getElementById('alert-calc-live');
+  if (IDX.ipca_mes !== null) {
+    alertEl.style.display = 'block';
+    alertEl.textContent = `✅ Índices carregados ao vivo da API do Banco Central (${IDX.ipca_periodo}). Selecione abaixo para usar valores reais.`;
+  }
+}
+
+// ============================================================
+// CALCULADORA — lógica
+// ============================================================
+const sel = document.getElementById('calc-contrato-sel');
+CONTRATOS.forEach(c => {
+  const opt = document.createElement('option'); opt.value = c.id;
+  opt.textContent = `${c.cliente} — ${c.contrato}`; sel.appendChild(opt);
+});
+
+function preencherContrato() {
+  const id = document.getElementById('calc-contrato-sel').value;
+  const box = document.getElementById('clausula-box');
+  if (!id) { box.style.display = 'none'; return; }
+  const c = CONTRATOS.find(x => x.id === id);
+  if (!c) return;
+
+  // Preenche valor
+  if (c.valorTotal > 0) document.getElementById('calc-valor').value = c.valorTotal;
+
+  // Preenche mês de aplicação automaticamente
+  if (c.mesReajuste) {
+    const sel = document.getElementById('calc-mes-aplicacao');
+    for (let opt of sel.options) {
+      if (opt.value.toLowerCase() === c.mesReajuste.toLowerCase()) { sel.value = opt.value; break; }
+    }
+  }
+
+  // Exibe cláusula
+  document.getElementById('clausula-val').textContent = c.clausula || 'Não informada';
+  document.getElementById('clausula-mes').textContent = c.mesReajuste || 'Não informado';
+  const obsEl = document.getElementById('clausula-obs');
+  const obsWrap = document.getElementById('clausula-obs-wrap');
+  if (c.obs) { obsEl.textContent = c.obs; obsWrap.style.display = 'block'; }
+  else { obsWrap.style.display = 'none'; }
+  // Fórmula de reajuste (Base de tempo col AA)
+  const reajEl = document.getElementById('clausula-reaj');
+  const reajWrap = document.getElementById('clausula-reaj-wrap');
+  if (c.reajuste && c.reajuste.trim() && c.reajuste !== '-') {
+    reajEl.textContent = c.reajuste;
+    reajWrap.style.display = 'block';
+  } else {
+    reajWrap.style.display = 'none';
+  }
+  box.style.display = 'block';
+
+  // Sugere índice se detectado e preenche % automaticamente
+  if (c.indiceSugerido) {
+    document.getElementById('calc-indice').value = c.indiceSugerido;
+    onIndiceChange();
+  }
+}
+
+function onIndiceChange() { _recalcPerc(); }
+
+function _recalcPerc() {
+  const sel = document.getElementById('calc-indice').value;
+  const mesNome = document.getElementById('calc-mes-aplicacao').value;
+  const percInput = document.getElementById('calc-perc');
+  const fonteTag = document.getElementById('calc-perc-fonte');
+  const estMap = { incc: 4.21, igpdi: 5.92, sinapi: 3.87 };
+  const serieMap = { ipca_12m: 'ipca', inpc_12m: 'inpc', igpm_12m: 'igpm' };
+  const mesMap12 = { ipca_mes: IDX.ipca_mes, igpm_mes: IDX.igpm_mes, inpc_mes: IDX.inpc_mes, selic: IDX.selic };
+
+  if (!sel) { percInput.value = ''; fonteTag.style.display = 'none'; return; }
+
+  let val = null, src = '', isEst = false, isBCB = false;
+
+  if (serieMap[sel]) {
+    // É um índice acumulado 12m — tentar calcular para o mês escolhido
+    const serie = serieMap[sel];
+    const anoAtual = new Date().getFullYear();
+
+    if (mesNome) {
+      // Tentar ano atual primeiro, depois anterior
+      let label = mesSelectToLabel(mesNome, anoAtual);
+      val = acum12mParaMes(serie, label);
+      if (val === null) {
+        label = mesSelectToLabel(mesNome, anoAtual - 1);
+        val = acum12mParaMes(serie, label);
+        if (val !== null) src = `BCB · acum.12m até ${label}`;
+      } else {
+        src = `BCB · acum.12m até ${label}`;
+      }
+      // Se não encontrou no histórico (mês futuro), usa último disponível
+      if (val === null) {
+        val = IDX[sel];
+        src = `BCB · acum.12m até ${IDX.ipca_periodo || 'último'} (mês futuro)`;
+      }
+    } else {
+      val = IDX[sel];
+      src = `BCB · acum.12m até ${IDX.ipca_periodo || 'último'}`;
+    }
+    isBCB = true;
+
+  } else if (mesMap12[sel] !== undefined) {
+    // Mensal ou Selic — não muda com o mês
+    val = mesMap12[sel];
+    src = `BCB · ${IDX.ipca_periodo || 'último mês'}`;
+    isBCB = true;
+
+  } else if (estMap[sel] !== undefined) {
+    val = estMap[sel]; src = 'estimado'; isEst = true;
+  }
+
+  if (val !== null) {
+    percInput.value = parseFloat(val.toFixed(2));
+    percInput.style.borderColor = isEst ? '' : 'rgba(0,229,160,0.4)';
+    fonteTag.textContent = src;
+    fonteTag.style.display = 'inline-flex';
+    fonteTag.style.background = isEst ? 'rgba(90,106,128,0.15)' : 'rgba(0,229,160,0.1)';
+    fonteTag.style.color = isEst ? 'var(--muted)' : 'var(--accent)';
+    fonteTag.style.borderColor = isEst ? 'rgba(90,106,128,0.3)' : 'rgba(0,229,160,0.2)';
+  } else if (isBCB) {
+    percInput.value = '';
+    percInput.placeholder = 'carregando API…';
+    fonteTag.textContent = 'BCB · aguardando';
+    fonteTag.style.display = 'inline-flex';
+    fonteTag.style.background = 'rgba(255,184,0,0.08)';
+    fonteTag.style.color = 'var(--warning)';
+    fonteTag.style.borderColor = 'rgba(255,184,0,0.3)';
+  } else {
+    percInput.value = '';
+    percInput.placeholder = '0,00';
+    fonteTag.style.display = 'none';
+  }
+}
+
+function calcularReajuste() {
+  const val = parseFloat(document.getElementById('calc-valor').value);
+  const perc = parseFloat(document.getElementById('calc-perc').value);
+  const mesApl = document.getElementById('calc-mes-aplicacao').value;
+  const indice = document.getElementById('calc-indice').value;
+
+  if (!val) { alert('Informe o valor base!'); return; }
+  if (isNaN(perc)) { alert('Informe o percentual de reajuste!'); return; }
+
+  const inc = val * (perc / 100);
+  const novo = val + inc;
+  const br = n => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+  // Fonte
+  const estMap = { incc: 'Estimado (FGV)', igpdi: 'Estimado (FGV)', sinapi: 'Estimado (CEF)' };
+  const liveMap = { ipca_mes: 1, ipca_12m: 1, igpm_mes: 1, igpm_12m: 1, inpc_mes: 1, inpc_12m: 1, selic: 1 };
+  let src = 'Manual';
+  if (indice && liveMap[indice]) src = `BCB ao vivo (${IDX.ipca_periodo || 'último período'})`;
+  else if (indice && estMap[indice]) src = estMap[indice];
+
+  document.getElementById('res-base').textContent = br(val);
+  document.getElementById('res-indice').textContent = perc.toFixed(2) + '%';
+  document.getElementById('res-incremento').textContent = br(inc);
+  document.getElementById('res-novo').textContent = br(novo);
+  document.getElementById('res-mes').textContent = mesApl || 'Não informado';
+  document.getElementById('res-obs').textContent = '✔ Reajuste calculado com sucesso.';
+  document.getElementById('res-fonte').textContent = `Fonte: ${src}`;
+  document.getElementById('resultado-calc').classList.add('visible');
+}
+
+function limparCalc() {
+  ['calc-valor', 'calc-perc'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('calc-indice').value = '';
+  document.getElementById('calc-mes-aplicacao').value = '';
+  document.getElementById('calc-contrato-sel').value = '';
+  document.getElementById('calc-perc-fonte').style.display = 'none';
+  document.getElementById('clausula-box').style.display = 'none';
+  document.getElementById('resultado-calc').classList.remove('visible');
+}
+
+// ============================================================
+// CONTRATOS
+// ============================================================
+function renderContratos(lista) {
+  const el = document.getElementById('lista-contratos');
+  document.getElementById('count-label').textContent = `${lista.length} contratos`;
+  if (!lista.length) { el.innerHTML = '<div class="card" style="text-align:center;color:var(--muted);padding:40px;">Nenhum encontrado.</div>'; return; }
+  const br = n => n > 0 ? n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : '—';
+  el.innerHTML = lista.map(c => `<div class="contrato-item">
+    <div class="contrato-id">${c.contrato}</div>
+    <div class="contrato-info">
+      <div class="contrato-nome">${c.cliente}</div>
+      <div class="contrato-meta">UEN ${c.uen} · ${c.diretoria} · ${c.linhaNegocios}${c.mesReajuste ? ' · Reaj: ' + c.mesReajuste : ''}${c.clausula ? ' · Cl. ' + c.clausula : ''}</div>
+      ${c.obs ? `<div class="contrato-meta" style="color:var(--warning);margin-top:2px;">⚠ ${c.obs}</div>` : ''}
+    </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.82rem;color:var(--accent);white-space:nowrap;">${br(c.valorTotal)}</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.68rem;color:var(--muted);white-space:nowrap;">${c.dataTerminoAdtv || '—'}</div>
+    <div class="contrato-status ${c.status === 'ok' ? 'status-ok' : c.status === 'vence' ? 'status-vence' : 'status-atrasado'}">${c.status === 'ok' ? 'Em dia' : c.status === 'vence' ? 'Vencendo' : 'Atrasado'}</div>
+  </div>`).join('');
+}
+
+function filtrarContratos() {
+  const q = document.getElementById('search-input').value.toLowerCase();
+  const st = document.getElementById('filter-status').value;
+  const dir = document.getElementById('filter-diretoria').value;
+  renderContratos(CONTRATOS.filter(c => {
+    const txt = `${c.cliente} ${c.contrato} ${c.uen} ${c.linhaNegocios} ${c.contratoCliente}`.toLowerCase();
+    return (!q || txt.includes(q)) && (!st || c.status === st) && (!dir || c.diretoria === dir);
+  }));
+}
+renderContratos(CONTRATOS);
+
+// ============================================================
+// PARAMÉTRICO
+// ============================================================
+let params = [];
+
+function getIndicesParamMenu() {
+  const base = { IPCA: IDX.ipca_12m, 'IGP-M': IDX.igpm_12m, INPC: IDX.inpc_12m, Selic: IDX.selic };
+  const est = { INCC: 4.21, 'IGP-DI': 5.92, SINAPI: 3.87 };
+  return { ...base, ...est };
+}
+
+function addParam(comp = '', ind = 'IPCA', peso = '') { params.push({ id: Date.now() + Math.random(), comp, ind, peso }); renderParams(); }
+function removeParam(id) { params = params.filter(p => p.id !== id); renderParams(); }
+
+function renderParams() {
+  const indices = getIndicesParamMenu();
+  document.getElementById('params-container').innerHTML = params.map(p => `<div class="param-row">
+    <div class="field"><input value="${p.comp}" placeholder="Ex.: Mão de Obra" onchange="updP(${p.id},'comp',this.value)"></div>
+    <div class="field"><select onchange="updP(${p.id},'ind',this.value)">${Object.keys(indices).map(k => `<option value="${k}" ${k === p.ind ? 'selected' : ''}>${k}${indices[k] !== null && indices[k] !== undefined ? ' (' + fmtPct(indices[k]) + ')' : ''}</option>`).join('')}</select></div>
+    <div class="field"><input type="number" value="${p.peso}" placeholder="Ex.: 60" min="0" max="100" step="0.1" onchange="updP(${p.id},'peso',this.value)"></div>
+    <div class="remove-btn" onclick="removeParam(${p.id})">✕</div>
+  </div>`).join('');
+  updateFormula();
+}
+
+function updP(id, f, v) { const p = params.find(x => x.id === id); if (p) p[f] = v; updateFormula(); }
+
+function updateFormula() {
+  const total = params.reduce((s, p) => s + (parseFloat(p.peso) || 0), 0);
+  document.getElementById('peso-total').innerHTML = `Total dos pesos: <span style="color:${Math.abs(total - 100) < 0.1 ? 'var(--accent)' : 'var(--danger)'}">${total.toFixed(1)}%</span>`;
+  if (!params.length) { document.getElementById('formula-preview').textContent = 'Adicione componentes…'; return; }
+  const nome = document.getElementById('fp-nome').value || 'R';
+  const termos = params.map(p => `<span style="color:#0090ff">${p.ind}</span><sub style="font-size:0.6rem;color:var(--muted)">(${p.comp || '?'})</sub> <span style="color:var(--accent3)">×</span> <span style="color:var(--warning)">${p.peso || '?'}%</span>`).join(' <span style="color:var(--accent3)">+</span> ');
+  document.getElementById('formula-preview').innerHTML = `<span style="color:var(--muted)">R(${nome}) = </span>${termos}`;
+}
+
+function calcularParametrico() {
+  const val = parseFloat(document.getElementById('fp-valor').value);
+  if (!val) { alert('Informe o valor base!'); return; }
+  const total = params.reduce((s, p) => s + (parseFloat(p.peso) || 0), 0);
+  if (Math.abs(total - 100) > 0.1) { alert(`Soma dos pesos deve ser 100%. Atual: ${total.toFixed(1)}%`); return; }
+  const indices = getIndicesParamMenu();
+  let reaj = 0; let rows = '';
+  params.forEach(p => {
+    const ind = indices[p.ind] !== null && indices[p.ind] !== undefined ? indices[p.ind] : 0;
+    const peso = parseFloat(p.peso) || 0; const contrib = ind * (peso / 100);
+    const isLive = ['IPCA', 'IGP-M', 'INPC', 'Selic'].includes(p.ind) && indices[p.ind] !== null;
+    reaj += contrib;
+    rows += `<tr><td style="padding:8px 12px">${p.comp || p.ind}</td><td style="padding:8px 12px;color:var(--accent2);font-family:'IBM Plex Mono',monospace">${p.ind}</td><td style="padding:8px 12px;font-family:'IBM Plex Mono',monospace">${peso.toFixed(1)}%</td><td style="padding:8px 12px;color:${isLive ? 'var(--accent)' : 'var(--muted)'};font-family:'IBM Plex Mono',monospace">${fmtPct(ind)} ${isLive ? '<span style="font-size:0.58rem;background:rgba(0,229,160,0.1);padding:1px 4px;border-radius:2px">BCB</span>' : '<span style="font-size:0.58rem;color:var(--muted)">(est.)</span>'}</td><td style="padding:8px 12px;color:var(--accent);font-family:'IBM Plex Mono',monospace">${fmtPct(contrib)}</td></tr>`;
+  });
+  const inc = val * (reaj / 100); const novo = val + inc;
+  const br = n => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  document.getElementById('resultado-param-conteudo').innerHTML = `
+    <div class="resultado-grid" style="margin-bottom:20px;">
+      <div class="resultado-item"><label>Valor Base</label><div class="val">${br(val)}</div></div>
+      <div class="resultado-item"><label>Reajuste Ponderado</label><div class="val">${fmtPct(reaj)}</div></div>
+      <div class="resultado-item"><label>Incremento</label><div class="val">${br(inc)}</div></div>
+      <div class="resultado-item"><label>Novo Valor</label><div class="val big">${br(novo)}</div></div>
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">
+      <thead><tr>${['Componente','Índice','Peso','Índice 12m','Contribuição'].map(h => `<th style="padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase">${h}</th>`).join('')}</tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div style="margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:0.62rem;color:var(--muted)">Fonte: Banco Central do Brasil – SGS (séries 433, 188, 189, 432). Período: acumulado 12 meses.</div>`;
+  document.getElementById('resultado-parametrico').classList.add('visible');
+}
+
+function limparParametrico() {
+  params = [];
+  document.getElementById('params-container').innerHTML = '';
+  document.getElementById('resultado-parametrico').classList.remove('visible');
+  document.getElementById('fp-nome').value = ''; document.getElementById('fp-valor').value = '';
+  updateFormula();
+}
+
+const templates = {
+  construcao: [{ comp: 'Mão de Obra', ind: 'INCC', peso: '60' }, { comp: 'Materiais', ind: 'IPCA', peso: '30' }, { comp: 'Equipamentos', ind: 'IGP-M', peso: '10' }],
+  servicos: [{ comp: 'Mão de Obra', ind: 'INPC', peso: '80' }, { comp: 'Insumos', ind: 'IPCA', peso: '20' }],
+  ti: [{ comp: 'Licenças de Software', ind: 'IPCA', peso: '50' }, { comp: 'Mão de Obra TI', ind: 'IGP-M', peso: '50' }],
+  manutencao: [{ comp: 'Peças e Materiais', ind: 'IGP-DI', peso: '40' }, { comp: 'Mão de Obra', ind: 'INCC', peso: '40' }, { comp: 'Transporte', ind: 'IPCA', peso: '20' }],
+};
+function loadTemplate(t) { params = []; templates[t].forEach(p => params.push({ id: Date.now() + Math.random(), ...p })); renderParams(); showTab('formula', document.querySelectorAll('.tab-btn')[4]); }
+
+// ============================================================
+// SHAREPOINT / MICROSOFT GRAPH API
+// ============================================================
+const SP_CONFIG = {
+  clientId:   'ac72a076-4fb4-49a2-9243-8766e04355d5',
+  tenantId:   '095fcbf2-5c04-40c7-9d9b-07006f3bb0bc',
+  siteHost:   'engelmigproject.sharepoint.com',
+  sitePath:   '/sites/engelmig',
+  itemId:     '1BEC7F47-94CD-4D7A-8771-B1EB5C111012',
+  scopes:     ['https://engelmigproject.sharepoint.com/AllSites.Read'],
+};
+
+// MSAL instance (lazy init após carregar a lib)
+let msalInstance = null;
+
+function initMsal() {
+  if (!window.msal) return null;
+  if (msalInstance) return msalInstance;
+  msalInstance = new msal.PublicClientApplication({
+    auth: {
+      clientId:   SP_CONFIG.clientId,
+      authority:  `https://login.microsoftonline.com/${SP_CONFIG.tenantId}`,
+      redirectUri: window.location.href.split('?')[0],
+    },
+    cache: { cacheLocation: 'sessionStorage' },
+  });
+  return msalInstance;
+}
+
+function spBanner(msg, cor) {
+  const b = document.getElementById('sp-banner');
+  const d = document.getElementById('sp-banner-dot');
+  const m = document.getElementById('sp-banner-msg');
+  b.style.display = 'flex';
+  d.style.background = cor || 'var(--warning)';
+  m.textContent = msg;
+}
+
+async function getSpToken() {
+  const msal = initMsal();
+  if (!msal) return null;
+  const accounts = msal.getAllAccounts();
+  const req = { scopes: SP_CONFIG.scopes, account: accounts[0] };
+  try {
+    const res = await msal.acquireTokenSilent(req);
+    return res.accessToken;
+  } catch {
+    try {
+      const res = await msal.acquireTokenPopup(req);
+      return res.accessToken;
+    } catch (e) {
+      console.warn('[SP] Falha ao obter token:', e);
+      return null;
+    }
+  }
+}
+
+async function carregarPlanilhaSharePoint() {
+  // Verificar se clientId foi configurado
+  if (SP_CONFIG.clientId === 'SEU_CLIENT_ID_AQUI') {
+    spBanner('⚠ Configure o clientId do Azure AD no SP_CONFIG para ativar sincronização ao vivo.', 'var(--warning)');
+    return false;
+  }
+
+  spBanner('Autenticando no Microsoft 365...', 'var(--warning)');
+
+  const token = await getSpToken();
+  if (!token) {
+    spBanner('Sem autenticação – usando dados embutidos.', '#666');
+    return false;
+  }
+
+  spBanner('Baixando Base Comercial.xlsx...', 'var(--accent2)');
+
+  try {
+    const graphUrl = `https://graph.microsoft.com/v1.0/sites/${SP_CONFIG.siteHost}:${SP_CONFIG.sitePath}:/drive/items/${SP_CONFIG.itemId}/content`;
+    const resp = await fetch(graphUrl, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+
+    const buffer = await resp.arrayBuffer();
+    const wb = XLSX.read(buffer, { type: 'array', cellDates: true });
+    const ws = wb.Sheets['Reajuste'];
+    if (!ws) throw new Error('Aba "Reajuste" não encontrada');
+
+    const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+
+    // Reprocessar contratos a partir dos dados ao vivo
+    const novosContratos = processarAbaReajuste(rows);
+    if (novosContratos.length > 0) {
+      // Substituir array global
+      CONTRATOS.length = 0;
+      novosContratos.forEach(c => CONTRATOS.push(c));
+      // Re-renderizar lista e select
+      renderContratos();
+      popularSelects();
+      spBanner(`✔ ${novosContratos.length} contratos carregados do SharePoint · ${new Date().toLocaleString('pt-BR')}`, 'var(--accent)');
+      return true;
+    }
+  } catch (e) {
+    console.warn('[SP] Erro ao carregar planilha:', e);
+    spBanner(`Erro ao carregar planilha: ${e.message} – usando dados embutidos.`, 'var(--danger)');
+  }
+  return false;
+}
+
+function processarAbaReajuste(rows) {
+  // Linha 0 = linha 1 (extra header), linha 1 = cabeçalhos
+  const contratos = [];
+  const MESES_PT = ['','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const fmtData = (v) => {
+    if (!v) return '';
+    if (v instanceof Date) return v.toLocaleDateString('pt-BR');
+    return String(v);
+  };
+  const fmtMes = (v) => {
+    if (!v || v === '-') return '';
+    if (v instanceof Date) return MESES_PT[v.getMonth()+1]+'/'+v.getFullYear();
+    return String(v);
+  };
+  const detectaIndice = (texto) => {
+    if (!texto) return '';
+    const t = String(texto).toUpperCase();
+    const ids = [];
+    if (t.includes('IPCA')) ids.push('ipca_12m');
+    if (t.includes('IGP-M') || t.includes('IGPM')) ids.push('igpm_12m');
+    if (t.includes('INPC')) ids.push('inpc_12m');
+    if (t.includes('INCC')) ids.push('incc');
+    return ids.length === 1 && String(texto).length < 30 ? ids[0] : '';
+  };
+
+  for (let i = 2; i < rows.length; i++) {
+    const r = rows[i];
+    if (!r || String(r[3]).trim().toUpperCase() !== 'ATIVO') continue;
+    contratos.push({
+      id:             String(r[0]  || ''),
+      uen:            String(r[1]  || ''),
+      diretoria:      String(r[2]  || ''),
+      cliente:        String(r[5]  || ''),
+      contrato:       String(r[8]  || ''),
+      contratoCliente:String(r[9]  || ''),
+      linhaNegocios:  String(r[4]  || ''),
+      mesReajuste:    fmtMes(r[11]),
+      clausula:       String(r[13] || ''),
+      obs:            String(r[14] || ''),
+      tipoContratacao:String(r[15] || ''),
+      valorTotal:     parseFloat(r[18]) || 0,
+      dataInicio:     fmtData(r[19]),
+      dataTerminoAdtv:fmtData(r[21]),
+      vigenciaMeses:  parseInt(r[22]) || 0,
+      status:         String(r[26] || ''),
+      reajuste:       String(r[28] || ''),
+      indiceSugerido: detectaIndice(r[28]),
+    });
+  }
+  return contratos;
+}
+
+// ============================================================
+// INIT
+// ============================================================
+renderIndices(); // mostra cards em estado de loading
+carregarTodosIndices();
+carregarPlanilhaSharePoint(); // tenta sincronizar com SharePoint
+</script>
+</body>
+</html>
