@@ -164,11 +164,11 @@ select option{background:var(--surface2);}
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
-<!-- Banner SharePoint -->
+<!-- Banner sincronização -->
 <div id="sp-banner" style="display:none;align-items:center;gap:10px;padding:8px 24px;background:rgba(0,144,255,0.08);border-bottom:1px solid rgba(0,144,255,0.2);font-family:'IBM Plex Mono',monospace;font-size:0.7rem;">
   <span id="sp-banner-dot" style="width:7px;height:7px;border-radius:50%;background:var(--warning);display:inline-block;"></span>
-  <span id="sp-banner-msg">Conectando ao SharePoint...</span>
-  <span style="margin-left:auto;color:var(--muted);">Base Comercial.xlsx · engelmigproject</span>
+  <span id="sp-banner-msg">Carregando...</span>
+  <span style="margin-left:auto;color:var(--muted);">Base Comercial.xlsx · SharePoint → Power Automate → GitHub</span>
 </div>
 <header>
   <div class="container">
@@ -1304,11 +1304,46 @@ function processarAbaReajuste(rows) {
 }
 
 // ============================================================
+// CARREGAR CONTRATOS DO GITHUB (atualizado pelo Power Automate)
+// ============================================================
+const GITHUB_JSON = 'https://raw.githubusercontent.com/MoniqueBona/reajustepro/main/contratos.json';
+
+async function carregarContratosGitHub() {
+  const banner = document.getElementById('sp-banner');
+  const dot    = document.getElementById('sp-banner-dot');
+  const msg    = document.getElementById('sp-banner-msg');
+  banner.style.display = 'flex';
+  dot.style.background = 'var(--warning)';
+  msg.textContent = 'Carregando contratos atualizados...';
+
+  try {
+    const resp = await fetch(GITHUB_JSON + '?t=' + Date.now()); // evita cache
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+
+    if (data.contratos && data.contratos.length > 0) {
+      CONTRATOS.length = 0;
+      data.contratos.forEach(c => CONTRATOS.push(c));
+      renderContratos();
+      popularSelects();
+      dot.style.background = 'var(--accent)';
+      const atualizado = data.atualizado ? ` · Planilha salva em: ${data.atualizado}` : '';
+      msg.textContent = `✔ ${data.contratos.length} contratos carregados${atualizado}`;
+      setTimeout(() => banner.style.display = 'none', 5000);
+    }
+  } catch(e) {
+    dot.style.background = '#666';
+    msg.textContent = 'Usando dados embutidos (GitHub offline ou JSON não encontrado)';
+    console.warn('[GitHub JSON]', e);
+  }
+}
+
+// ============================================================
 // INIT
 // ============================================================
-renderIndices(); // mostra cards em estado de loading
+renderIndices();
 carregarTodosIndices();
-carregarPlanilhaSharePoint(); // tenta sincronizar com SharePoint
+carregarContratosGitHub();
 </script>
 </body>
 </html>
